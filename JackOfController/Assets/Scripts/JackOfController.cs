@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using StateMachine;
 
 public enum AerialMovementSettings {
     FullMovement,
@@ -13,6 +14,7 @@ public enum AerialMovementSettings {
 public class JackOfController : MonoBehaviour {
 
     [Header( "References" )]
+    public StateMachine<JackOfController> stateMachine;
     public CharacterController cc;
     public Camera cam;
 
@@ -79,17 +81,6 @@ public class JackOfController : MonoBehaviour {
     public AnimationCurve startSprintCurve;
     public AnimationCurve endSprintCurve;
 
-    //Crouch Settings
-    [Tooltip( "Toggle crouch or hold to crouch" )]
-    public bool toggleCrouch = false;
-    [Tooltip( "The height of the camera when crouching" )]
-    public float crouchCamHeight = 0.5f;
-    public float crouchPlayerHeight;
-    [Tooltip( "How fast is the player when crouching?" )]
-    public float crouchSpeed = 0f;
-    [Tooltip( "How much slower or faster is the player while crouching, only used if crouchSpeed is 0" )]
-    public float relativeCrouchSpeed = 0.5f;
-
     //Aerial Movement Settings
     [Tooltip( "How much freedom of movement should the player have in mid-air?" )]
     public AerialMovementSettings aerialMovement;
@@ -99,7 +90,7 @@ public class JackOfController : MonoBehaviour {
     private PlayerInput playerInput;
 
     //Camera
-    private float playerStartHeight;
+    public float playerStartHeight;
     private float camStartHeight;
     private float xCamRotation = 0.0f;
     private float yCamRotation = 0.0f;
@@ -109,8 +100,7 @@ public class JackOfController : MonoBehaviour {
     private bool sprinting = false;
     private bool jump = false;
     private bool grounded = true;
-    private bool crouching = false;
-    private bool crouchCanceled = false;
+    public float currentSpeed;
     private Vector2 rawMovementVector;
     public Vector3 velocity;
 
@@ -124,7 +114,8 @@ public class JackOfController : MonoBehaviour {
         Cursor.lockState = CursorLockMode.Locked;
     }
 
-    public void OnLook( InputAction.CallbackContext value ) {
+    #region Input
+	public void OnLook( InputAction.CallbackContext value ) {
         Vector2 mouseLook = value.ReadValue<Vector2>();
         lookVector = new Vector2( mouseLook.y, mouseLook.x );
     }
@@ -141,51 +132,10 @@ public class JackOfController : MonoBehaviour {
     public void OnJump( InputAction.CallbackContext value ) {
         if ( value.performed && grounded ) jump = true;
     }
+	#endregion
 
-    public void OnCrouch( InputAction.CallbackContext value ) {
-        if ( toggleCrouch ) {
-            bool newCrouching = !crouching;
-
-            if ( newCrouching )
-                Crouch();
-			else
-                ExitCrouch();
-		}
-		else {
-            if ( value.performed )
-                Crouch();
-            if ( value.canceled )
-                ExitCrouch();
-        }
-    }
-
-    public void Crouch() {
-        crouching = true;
-        crouchCanceled = false;
-        cam.transform.localPosition = new Vector3( cam.transform.localPosition.x, crouchCamHeight, cam.transform.localPosition.z );
-        cc.height = crouchPlayerHeight;
-    }
-
-    public void ExitCrouch() {
-        if ( !CantStand() ) {
-            crouching = false;
-            cam.transform.localPosition = new Vector3( cam.transform.localPosition.x, camStartHeight, cam.transform.localPosition.z );
-            cc.height = playerStartHeight;
-        }
-        else {
-            crouchCanceled = true;
-        }
-    }
-
-    public bool CantStand() {
-        float radius = playerStartHeight / 4f;
-        return Physics.CheckSphere( new Vector3( cc.transform.position.x, radius * 3f, cc.transform.position.z ), radius, groundMask );
-	}
-
-    private void Update() {
-        float moveSpeed = speed;
-
-        //Camera
+	#region Movement
+    public void CameraLook() {
         xCamRotation -= sensitivity * lookVector.x;
         yCamRotation += sensitivity * lookVector.y;
 
@@ -194,52 +144,47 @@ public class JackOfController : MonoBehaviour {
         xCamRotation = Mathf.Clamp( xCamRotation, xRotationLimitsUp, xRotationLimitsDown );
         cam.transform.eulerAngles = new Vector3( xCamRotation, yCamRotation, 0f );
         cc.transform.eulerAngles = new Vector3( cc.transform.eulerAngles.x, yCamRotation, cc.transform.eulerAngles.z );
+    }
 
-        //GroundCheck
-        float radius = cc.height / 4f;
-        grounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, radius, cc.transform.position.z ), groundDistance, groundMask );
+    public void Walk() {
+        Vector3 relativeMovementVector = rawMovementVector.x * cc.transform.right + rawMovementVector.y * cc.transform.forward;
+        Vector3 finalMovementVector = new Vector3( relativeMovementVector.x * currentSpeed, velocity.y, relativeMovementVector.z * currentSpeed );
+        cc.Move( finalMovementVector * Time.deltaTime );
+    }
 
-        //Gravity
+    public void Jump() {
+        if ( jump ) {
+            velocity.y = Mathf.Sqrt( jumpHeight * -2 * gravity );
+            jump = false;
+        }
+        cc.Move( velocity * Time.deltaTime );
+    }
+
+    public void Gravity() {
         if ( !grounded )
             velocity.y += gravity * Time.deltaTime;
         else
             velocity.y = stickToGroundForce;
+    }
+	#endregion
 
-        //Crouch
-        if ( crouching && !sprinting ) {
-            if ( crouchSpeed != 0f )
-                moveSpeed = crouchSpeed;
-			else
-                moveSpeed *= relativeCrouchSpeed;
-		}
+	#region Checks
+	public void CheckGround() {
+        float radius = cc.height / 4f;
+        grounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, radius, cc.transform.position.z ), groundDistance, groundMask );
+    }
 
-        if ( crouchCanceled ) {
-            ExitCrouch();
-		}
-
-        //Sprint
+    public void CheckSprint() {
         if ( sprintAllowed && !crouching ) {
             if ( sprinting ) {
-                if ( relativeSprintSpeed != 0f ) 
-                    moveSpeed = speed * relativeSprintSpeed;
-                else 
-                    moveSpeed = sprintSpeed;
+                if ( sprintSpeed != 0f )
+                    currentSpeed = sprintSpeed;
+                else
+                    currentSpeed = speed * relativeSprintSpeed;
             }
         }
-
-        //Movement
-        Vector3 relativeMovementVector = rawMovementVector.x * cc.transform.right + rawMovementVector.y * cc.transform.forward;
-        Vector3 finalMovementVector = new Vector3( relativeMovementVector.x * moveSpeed, velocity.y, relativeMovementVector.z * moveSpeed );
-        cc.Move( finalMovementVector * Time.deltaTime );
-
-        //Jump
-        if ( jump  ) {
-            velocity.y = Mathf.Sqrt( jumpHeight * -2 * gravity );
-            jump = false;
-        }
-
-        cc.Move( velocity * Time.deltaTime );
-	}
+    }
+    #endregion
 
 	public void OnDrawGizmos() {
         float radius = playerStartHeight / 4;
