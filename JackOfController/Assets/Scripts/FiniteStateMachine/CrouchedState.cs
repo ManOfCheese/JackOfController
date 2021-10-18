@@ -34,6 +34,7 @@ public class CrouchedState : State<JackOfManager> {
 
 		_owner.joc.cam.transform.localPosition = new Vector3( _owner.joc.cam.transform.localPosition.x, cm.crouchCamHeight, 
 			_owner.joc.cam.transform.localPosition.z );
+		JoC.currentCamHeight = cm.crouchCamHeight;
 		JoC.cc.height = cm.crouchPlayerHeight;
 
 		if ( cm.crouchSpeed != 0f )
@@ -60,6 +61,7 @@ public class CrouchedState : State<JackOfManager> {
 	public override void ExitState( JackOfManager _owner ) {
 		_owner.joc.cam.transform.localPosition = new Vector3( _owner.joc.cam.transform.localPosition.x,
 			_owner.joc.camStartHeight, _owner.joc.cam.transform.localPosition.z );
+		_owner.joc.currentCamHeight = _owner.joc.camStartHeight;
 		_owner.joc.cc.height = _owner.joc.playerStartHeight;
 		_owner.joc.currentSpeed = _owner.joc.speed;
 	}

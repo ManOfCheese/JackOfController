@@ -71,6 +71,7 @@
     <Compile Include="Assets\Scripts\JackOfController.cs" />
     <Compile Include="Assets\Scripts\JackOfManager.cs" />
     <Compile Include="Assets\Scripts\Modules\CrouchModule.cs" />
+    <Compile Include="Assets\Scripts\Modules\HeadBobModule.cs" />
     <Compile Include="Assets\Scripts\Modules\Module.cs" />
     <Compile Include="Assets\Scripts\Modules\ScreenTiltModule.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\PersistentSet.cs" />

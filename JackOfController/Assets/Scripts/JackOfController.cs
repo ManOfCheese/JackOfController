@@ -68,19 +68,20 @@ public class JackOfController : MonoBehaviour {
     [HideInInspector] public GroundedState groundedState;
     [HideInInspector] public AirborneState airborneState;
 
-    //Camera
+    //Startup
     [HideInInspector] public float playerStartHeight;
     [HideInInspector] public float camStartHeight;
-    [HideInInspector] public float xCamRotation = 0.0f;
-    [HideInInspector] public float yCamRotation = 0.0f;
-    [HideInInspector] public Vector2 lookVector;
 
-    //Movement
+    //Runtime
     [HideInInspector] public bool sprinting = false;
     [HideInInspector] public bool jump = false;
     [HideInInspector] public bool grounded = true;
     [HideInInspector] public float currentSpeed;
+    [HideInInspector] public float currentCamHeight;
+    [HideInInspector] public float xCamRotation = 0.0f;
+    [HideInInspector] public float yCamRotation = 0.0f;
     [HideInInspector] public int jumpCount;
+    [HideInInspector] public Vector2 lookVector;
     [HideInInspector] public Vector2 rawMovementVector;
     [HideInInspector] public Vector3 velocity;
     [HideInInspector] public Vector3 velocityOnJump;
@@ -98,6 +99,7 @@ public class JackOfController : MonoBehaviour {
         currentSpeed = speed;
         playerStartHeight = cc.height;
         camStartHeight = cam.transform.localPosition.y;
+        currentCamHeight = camStartHeight;
         Cursor.lockState = CursorLockMode.Locked;
     }
 
