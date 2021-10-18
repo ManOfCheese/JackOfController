@@ -28,7 +28,7 @@ public class JackOfManager : MonoBehaviour {
 		states.Add( joc.groundedState );
 		states.Add( joc.airborneState );
 		for ( int i = 0; i < modules.Length; i++ ) {
-			states.Add( modules[ i ].state );
+			if ( modules[ i ].state != null ) states.Add( modules[ i ].state );
 		}
 
 		statesByName = new Dictionary<string, State<JackOfManager>>();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using StateMachine;
 
 public enum AerialMovementSettings {
     FullMovement,
@@ -29,36 +28,12 @@ public class JackOfController : MonoBehaviour {
     [Tooltip( "How many degrees the camera can rotate downwards before locking in place" )]
     public float xRotationLimitsDown = 60f;
 
-    //Head Bob Settings
-    [Tooltip( "When true the camera moves up and down to simulate the movement of someone walking." )]
-    public bool headBob;
-    [Tooltip( "How quickly the camera moves up and down." )]
-    public float headBobSpeed;
-    [Tooltip( "How far up and down the camera moves, if  this is higher it the camera will also need to move faster to cover the distance." )]
-    public float headBobIntensity;
-
-    //FOV Boost Settings
-    [Tooltip( "How long does the FOV boost last." )]
-    public float FOVBoostDuration;
-    [Tooltip( "How much does the FOV increase." )]
-    public float FOVBoostIntensity;
-    [Tooltip( "Curve used to increase and decrease FOV when FOV boost happens." )]
-    public AnimationCurve FOVBoostCurve;
-
-    //Screen Tilt Settings
-    [Tooltip( "How many degrees does the screen tilt." )]
-    public float maximumTilt;
-
     [Header( "Movement Settings" )]
     [Tooltip("Speed of movement in units per second")]
     public float speed = 5f;
     [Tooltip( "How fast does the player fall" )]
     public float gravity;
     public float stickToGroundForce = 1f;
-
-    [Header( "Groundcheck Settings" )]
-    public float groundDistance;
-    public LayerMask groundMask;
 
     [Header( "Sprint Settings" )]
     [Tooltip( "Is sprinting enabled" )]
@@ -84,6 +59,10 @@ public class JackOfController : MonoBehaviour {
     [Tooltip( "How fast can the player change direction in mid-air with limited camera movement" )]
     public float aerialTurnSpeed;
     public bool midAirSprint;
+
+    [Header( "Groundcheck Settings" )]
+    public float groundDistance;
+    public LayerMask groundMask;
 
     private PlayerInput playerInput;
     [HideInInspector] public GroundedState groundedState;
@@ -153,7 +132,7 @@ public class JackOfController : MonoBehaviour {
         xCamRotation %= 360;
         yCamRotation %= 360;
         xCamRotation = Mathf.Clamp( xCamRotation, xRotationLimitsUp, xRotationLimitsDown );
-        cam.transform.eulerAngles = new Vector3( xCamRotation, yCamRotation, 0f );
+        cam.transform.eulerAngles = new Vector3( xCamRotation, yCamRotation, cam.transform.eulerAngles.z );
         cc.transform.eulerAngles = new Vector3( cc.transform.eulerAngles.x, yCamRotation, cc.transform.eulerAngles.z );
     }
 
