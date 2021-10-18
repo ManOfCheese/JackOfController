@@ -66,7 +66,6 @@ public class JackOfController : MonoBehaviour {
     [Tooltip( "How many times the player can jump" )]
     public int jumps = 1;
 
-
     //Sprint Settings
     [Tooltip( "Is sprinting enabled" )]
     public bool sprintAllowed = true;
@@ -88,27 +87,32 @@ public class JackOfController : MonoBehaviour {
     public float aerialTurnSpeed;
 
     private PlayerInput playerInput;
+    [HideInInspector] public GroundedState groundedState;
 
     //Camera
-    public float playerStartHeight;
-    private float camStartHeight;
-    private float xCamRotation = 0.0f;
-    private float yCamRotation = 0.0f;
-    public Vector2 lookVector;
+    [HideInInspector] public float playerStartHeight;
+    [HideInInspector] public float camStartHeight;
+    [HideInInspector] public float xCamRotation = 0.0f;
+    [HideInInspector] public float yCamRotation = 0.0f;
+    [HideInInspector] public Vector2 lookVector;
 
     //Movement
-    private bool sprinting = false;
-    private bool jump = false;
-    private bool grounded = true;
-    public float currentSpeed;
-    private Vector2 rawMovementVector;
-    public Vector3 velocity;
+    [HideInInspector] public bool sprinting = false;
+    [HideInInspector] public bool jump = false;
+    [HideInInspector] public bool grounded = true;
+    [HideInInspector] public float currentSpeed;
+    [HideInInspector] public Vector2 rawMovementVector;
+    [HideInInspector] public Vector3 velocity;
 
     private void Awake() {
         playerInput = GetComponent<PlayerInput>();
         playerInput.ActivateInput();
         playerInput.SwitchCurrentActionMap( "PlayerControls" );
 
+        groundedState = GroundedState.Instance;
+        groundedState.stateName = "GroundedState";
+
+        currentSpeed = speed;
         playerStartHeight = cc.height;
         camStartHeight = cam.transform.localPosition.y;
         Cursor.lockState = CursorLockMode.Locked;
@@ -126,7 +130,10 @@ public class JackOfController : MonoBehaviour {
 
     public void OnSprint( InputAction.CallbackContext value ) {
         if ( value.started ) sprinting = true;
-        if ( value.canceled ) sprinting = false;
+        if ( value.canceled ) {
+            sprinting = false;
+            currentSpeed = speed;
+        }
     }
 
     public void OnJump( InputAction.CallbackContext value ) {
@@ -153,7 +160,7 @@ public class JackOfController : MonoBehaviour {
     }
 
     public void Jump() {
-        if ( jump ) {
+        if ( jump && grounded ) {
             velocity.y = Mathf.Sqrt( jumpHeight * -2 * gravity );
             jump = false;
         }
@@ -161,21 +168,23 @@ public class JackOfController : MonoBehaviour {
     }
 
     public void Gravity() {
-        if ( !grounded )
-            velocity.y += gravity * Time.deltaTime;
-        else
-            velocity.y = stickToGroundForce;
+        velocity.y += gravity * Time.deltaTime;
+    }
+
+    public void StickToGround() {
+        velocity.y = stickToGroundForce;
     }
 	#endregion
 
 	#region Checks
 	public void CheckGround() {
         float radius = cc.height / 4f;
-        grounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, radius, cc.transform.position.z ), groundDistance, groundMask );
+        grounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, cc.transform.position.z ), 
+            groundDistance, groundMask );
     }
 
     public void CheckSprint() {
-        if ( sprintAllowed && !crouching ) {
+        if ( sprintAllowed ) {
             if ( sprinting ) {
                 if ( sprintSpeed != 0f )
                     currentSpeed = sprintSpeed;
@@ -190,9 +199,11 @@ public class JackOfController : MonoBehaviour {
         float radius = playerStartHeight / 4;
 
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere( new Vector3( cc.transform.position.x, radius, cc.transform.position.z ), groundDistance );
+        Gizmos.DrawWireSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, 
+            cc.transform.position.z ), groundDistance );
 
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere( new Vector3( cc.transform.position.x, radius * 3f, cc.transform.position.z ), radius );
+        Gizmos.DrawWireSphere( new Vector3( cc.transform.position.x, cc.transform.position.y + radius, 
+            cc.transform.position.z ), groundDistance );
     }
 }

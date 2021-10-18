@@ -64,15 +64,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\Scripts\CrouchModule.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\AirborneState.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\CrouchedState.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\FiniteStateMachine.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\GroundedState.cs" />
     <Compile Include="Assets\Scripts\JackOfController.cs" />
-    <Compile Include="Assets\Scripts\JackOfControllerEditor.cs" />
-    <Compile Include="Assets\Scripts\JackOfControllerManager.cs" />
-    <Compile Include="Assets\Scripts\Module.cs" />
+    <Compile Include="Assets\Scripts\JackOfManager.cs" />
+    <Compile Include="Assets\Scripts\Modules\CrouchModule.cs" />
+    <Compile Include="Assets\Scripts\Modules\Module.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\PersistentSet.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\PersistentSetElement.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\SetTypes\BoolValue_Set.cs" />

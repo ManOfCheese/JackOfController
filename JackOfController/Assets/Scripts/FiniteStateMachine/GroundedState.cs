@@ -3,17 +3,45 @@ using System.Collections.Generic;
 using UnityEngine;
 using StateMachine;
 
-public class GroundedState : State<JackOfController> {
+public class GroundedState : State<JackOfManager> {
 
-	public override void EnterState( JackOfController _owner ) {
-		throw new System.NotImplementedException();
+	#region singleton
+	//Create a single instance of this state for all state machines.
+	private static GroundedState _instance;
+
+	private GroundedState() {
+		if ( _instance != null ) {
+			return;
+		}
+
+		_instance = this;
 	}
 
-	public override void UpdateState( JackOfController _owner ) {
-		throw new System.NotImplementedException();
+	public static GroundedState Instance {
+		get {
+			if ( _instance == null ) {
+				new GroundedState();
+			}
+
+			return _instance;
+		}
+	}
+	#endregion
+
+	public override void EnterState( JackOfManager _owner ) {
+
 	}
 
-	public override void ExitState( JackOfController _owner ) {
-		throw new System.NotImplementedException();
+	public override void UpdateState( JackOfManager _owner ) {
+		_owner.joc.CameraLook();
+		_owner.joc.CheckSprint();
+		_owner.joc.Walk();
+		_owner.joc.Gravity();
+		_owner.joc.CheckGround();
+		_owner.joc.Jump();
+	}
+
+	public override void ExitState( JackOfManager _owner ) {
+
 	}
 }

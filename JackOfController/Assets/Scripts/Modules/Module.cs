@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using StateMachine;
 
 public class Module : MonoBehaviour {
 
-    public JackOfControllerManager JoCManager;
+    public JackOfManager JoCManager;
     public string moduleName;
+
+    //State
+    [HideInInspector] public State<JackOfManager> state;
 
     private PlayerInput playerInput;
 

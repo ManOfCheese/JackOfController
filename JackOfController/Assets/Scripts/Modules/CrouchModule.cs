@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using StateMachine;
 
 public class CrouchModule : Module {
 
@@ -16,11 +17,13 @@ public class CrouchModule : Module {
     [Tooltip( "How much slower or faster is the player while crouching, only used if crouchSpeed is 0" )]
     public float relativeCrouchSpeed = 0.5f;
 
-    public bool crouching = false;
-    public bool crouchCanceled = false;
+    [HideInInspector] public bool crouching = false;
+    [HideInInspector] public bool crouchCanceled = false;
 
 	protected override void Awake() {
 		base.Awake();
+        state = CrouchedState.Instance;
+        state.stateName = "CrouchedState";
 	}
 
 	public void OnCrouch( InputAction.CallbackContext value ) {
@@ -28,36 +31,37 @@ public class CrouchModule : Module {
             bool newCrouching = !crouching;
 
             if ( newCrouching ) {
-                //Enter crouch state.
+                JoCManager.stateMachine.ChangeState( JoCManager.statesByName[ "CrouchedState" ] );
             }
 			else {
                 if ( CheckCeiling() ) {
                     crouchCanceled = true;
 				}
 				else {
-                    //Exit Crouch State.
-				}
+                    JoCManager.stateMachine.ChangeState( JoCManager.statesByName[ "GroundedState" ] );
+                }
 			}
         }
         else {
             if ( value.performed ) {
-                //Enter crouch state.
+                JoCManager.stateMachine.ChangeState( JoCManager.statesByName[ "CrouchedState" ] );
             }
             if ( value.canceled ) {
                 if ( CheckCeiling() ) {
                     crouchCanceled = true;
                 }
                 else {
-                    //Exit Crouch State.
+                    JoCManager.stateMachine.ChangeState( JoCManager.statesByName[ "GroundedState" ] );
                 }
             }
         }
     }
 
     public bool CheckCeiling() {
-        float radius = JoCManager.bc.playerStartHeight / 4f;
-        return Physics.CheckSphere( new Vector3( JoCManager.bc.cc.transform.position.x, radius * 3f,
-            JoCManager.bc.transform.position.z ), radius, JoCManager.bc.groundMask );
+        float radius = JoCManager.joc.playerStartHeight / 4f;
+        return Physics.CheckSphere( new Vector3( JoCManager.joc.cc.transform.position.x, 
+            JoCManager.joc.cc.transform.position. y + ( radius * 2f ),
+            JoCManager.joc.transform.position.z ), radius, JoCManager.joc.groundMask );
     }
 
 }

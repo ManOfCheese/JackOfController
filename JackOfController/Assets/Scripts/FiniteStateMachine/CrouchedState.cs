@@ -3,28 +3,64 @@ using System.Collections.Generic;
 using UnityEngine;
 using StateMachine;
 
-public class CrouchedState : State<JackOfControllerManager> {
+public class CrouchedState : State<JackOfManager> {
 
-	public override void EnterState( JackOfControllerManager _owner ) {
-		JackOfController bc = _owner.bc;
-		CrouchModule cm = _owner.modules[ "CrouchModule" ] as CrouchModule;
+	#region singleton
+	//Create a single instance of this state for all state machines.
+	private static CrouchedState _instance;
 
-		bc.cam.transform.localPosition = new Vector3( bc.cam.transform.localPosition.x, cm.crouchCamHeight, bc.cam.transform.localPosition.z );
-		bc.cc.height = cm.crouchPlayerHeight;
+	private CrouchedState() {
+		if ( _instance != null ) {
+			return;
+		}
+
+		_instance = this;
+	}
+
+	public static CrouchedState Instance {
+		get {
+			if ( _instance == null ) {
+				new CrouchedState();
+			}
+
+			return _instance;
+		}
+	}
+	#endregion
+
+	public override void EnterState( JackOfManager _owner ) {
+		JackOfController JoC = _owner.joc;
+		CrouchModule cm = _owner.modulesByName[ "CrouchModule" ] as CrouchModule;
+
+		_owner.joc.cam.transform.localPosition = new Vector3( _owner.joc.cam.transform.localPosition.x, cm.crouchCamHeight, 
+			_owner.joc.cam.transform.localPosition.z );
+		JoC.cc.height = cm.crouchPlayerHeight;
 
 		if ( cm.crouchSpeed != 0f )
-			bc.currentSpeed = cm.crouchSpeed;
+			_owner.joc.currentSpeed = cm.crouchSpeed;
 		else
-			bc.currentSpeed = bc.speed * cm.relativeCrouchSpeed;
+			_owner.joc.currentSpeed = _owner.joc.speed * cm.relativeCrouchSpeed;
 	}
 
-	public override void UpdateState( JackOfControllerManager _owner ) {
-		throw new System.NotImplementedException();
+	public override void UpdateState( JackOfManager _owner ) {
+		CrouchModule cm = _owner.modulesByName[ "CrouchModule" ] as CrouchModule;
+
+		_owner.joc.CameraLook();
+		_owner.joc.Walk();
+		_owner.joc.Gravity();
+		_owner.joc.CheckGround();
+		if ( cm.crouchCanceled ) {
+			if ( !cm.CheckCeiling() ) {
+				_owner.stateMachine.ChangeState( _owner.statesByName[ "GroundedState" ] );
+				cm.crouchCanceled = false;
+			}
+		}
 	}
 
-	public override void ExitState( JackOfControllerManager _owner ) {
-		_owner.cam.transform.localPosition = new Vector3( _owner.cam.transform.localPosition.x, bc.camStartHeight, _owner.cam.transform.localPosition.z );
-		_owner.cc.height = _owner.playerStartHeight;
-		_owner.currentSpeed = _owner.speed;
+	public override void ExitState( JackOfManager _owner ) {
+		_owner.joc.cam.transform.localPosition = new Vector3( _owner.joc.cam.transform.localPosition.x,
+			_owner.joc.camStartHeight, _owner.joc.cam.transform.localPosition.z );
+		_owner.joc.cc.height = _owner.joc.playerStartHeight;
+		_owner.joc.currentSpeed = _owner.joc.speed;
 	}
 }
