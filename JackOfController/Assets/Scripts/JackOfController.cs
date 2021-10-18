@@ -69,22 +69,22 @@ public class JackOfController : MonoBehaviour {
     [HideInInspector] public AirborneState airborneState;
 
     //Startup
-    [HideInInspector] public float playerStartHeight;
-    [HideInInspector] public float camStartHeight;
+    [ReadOnly] public float playerStartHeight;
+    [ReadOnly] public float camStartHeight;
 
     //Runtime
-    [HideInInspector] public bool sprinting = false;
-    [HideInInspector] public bool jump = false;
-    [HideInInspector] public bool grounded = true;
-    [HideInInspector] public float currentSpeed;
-    [HideInInspector] public float currentCamHeight;
-    [HideInInspector] public float xCamRotation = 0.0f;
-    [HideInInspector] public float yCamRotation = 0.0f;
-    [HideInInspector] public int jumpCount;
-    [HideInInspector] public Vector2 lookVector;
-    [HideInInspector] public Vector2 rawMovementVector;
-    [HideInInspector] public Vector3 velocity;
-    [HideInInspector] public Vector3 velocityOnJump;
+    [ReadOnly] public bool sprinting = false;
+    [ReadOnly] public bool jump = false;
+    [ReadOnly] public bool grounded = true;
+    [ReadOnly] public float currentSpeed;
+    [ReadOnly] public float currentCamHeight;
+    [ReadOnly] public float xCamRotation = 0.0f;
+    [ReadOnly] public float yCamRotation = 0.0f;
+    [ReadOnly] public int jumpCount;
+    [ReadOnly] public Vector2 lookVector;
+    [ReadOnly] public Vector2 rawMovementVector;
+    [ReadOnly] public Vector3 velocity;
+    [ReadOnly] public Vector3 velocityOnJump;
 
     private void Awake() {
         playerInput = GetComponent<PlayerInput>();
@@ -141,7 +141,8 @@ public class JackOfController : MonoBehaviour {
     public void Walk() {
         if ( grounded || aerialMovement == AerialMovementSettings.FullMovement ) {
             Vector3 relativeMovementVector = rawMovementVector.x * cc.transform.right + rawMovementVector.y * cc.transform.forward;
-            Vector3 finalMovementVector = new Vector3( relativeMovementVector.x * currentSpeed, velocity.y, relativeMovementVector.z * currentSpeed );
+            Vector3 finalMovementVector = new Vector3( relativeMovementVector.x * currentSpeed, velocity.y, 
+                relativeMovementVector.z * currentSpeed );
             cc.Move( finalMovementVector * Time.deltaTime );
         }
     }
@@ -186,13 +187,21 @@ public class JackOfController : MonoBehaviour {
         newGrounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, cc.transform.position.z ), 
             groundDistance, groundMask );
 
+        //if ( radius < 0.25f ) {
+        //    Debug.Log( cc.transform.position.y );
+        //    Debug.Log( cc.height );
+        //    Debug.Log( radius );
+        //    Debug.Log( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, cc.transform.position.z ) );
+        //}
+
         if ( newGrounded != grounded ) {
-            if ( newGrounded ) {
+            if ( newGrounded && jocManager.stateMachine.CurrentState != jocManager.statesByName[ "GroundedState" ] ) {
                 jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
                 velocityOnJump = Vector3.zero;
                 jumpCount = 0;
             }
-            if ( !newGrounded ) jocManager.stateMachine.ChangeState( jocManager.statesByName[ "AirborneState" ] );
+            if ( !newGrounded && jocManager.stateMachine.CurrentState != jocManager.statesByName[ "AirborneState" ] ) 
+                jocManager.stateMachine.ChangeState( jocManager.statesByName[ "AirborneState" ] );
         }
 
         grounded = newGrounded;
@@ -208,7 +217,7 @@ public class JackOfController : MonoBehaviour {
             }
         }
     }
-    #endregion
+	#endregion
 
 	public void OnDrawGizmos() {
         float radius = playerStartHeight / 4;

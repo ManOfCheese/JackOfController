@@ -896,7 +896,7 @@ MonoBehaviour:
   jocManager: {fileID: 0}
   moduleName: HeadBobModule
   headBobSpeed: 5
-  headBobIntensity: 0.1
+  headBobIntensity: 0.2
 --- !u!1 &1562725415
 GameObject:
   m_ObjectHideFlags: 0

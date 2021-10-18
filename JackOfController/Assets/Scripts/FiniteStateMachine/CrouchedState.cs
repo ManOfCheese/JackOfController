@@ -29,13 +29,14 @@ public class CrouchedState : State<JackOfManager> {
 	#endregion
 
 	public override void EnterState( JackOfManager _owner ) {
-		JackOfController JoC = _owner.joc;
+		JackOfController joc = _owner.joc;
 		CrouchModule cm = _owner.modulesByName[ "CrouchModule" ] as CrouchModule;
 
 		_owner.joc.cam.transform.localPosition = new Vector3( _owner.joc.cam.transform.localPosition.x, cm.crouchCamHeight, 
 			_owner.joc.cam.transform.localPosition.z );
-		JoC.currentCamHeight = cm.crouchCamHeight;
-		JoC.cc.height = cm.crouchPlayerHeight;
+		joc.currentCamHeight = cm.crouchCamHeight;
+		joc.cc.height = cm.crouchPlayerHeight;
+		joc.cc.Move( Vector3.down );
 
 		if ( cm.crouchSpeed != 0f )
 			_owner.joc.currentSpeed = cm.crouchSpeed;

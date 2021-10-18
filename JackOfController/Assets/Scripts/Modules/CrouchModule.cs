@@ -27,31 +27,33 @@ public class CrouchModule : Module {
 	}
 
 	public void OnCrouch( InputAction.CallbackContext value ) {
-        if ( jocManager.stateMachine.CurrentState != jocManager.statesByName[ "AirborneState" ] ) {
+        State<JackOfManager> currentState = jocManager.stateMachine.CurrentState;
+
+        if ( currentState != jocManager.statesByName[ "AirborneState" ] ) {
             if ( toggleCrouch ) {
                 bool newCrouching = !crouching;
 
-                if ( newCrouching ) {
+                if ( newCrouching && currentState != jocManager.statesByName[ "CrouchedState" ] ) {
                     jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
                 }
                 else {
                     if ( CheckCeiling() ) {
                         crouchCanceled = true;
                     }
-                    else {
+                    else if ( newCrouching && currentState != jocManager.statesByName[ "GroundedState" ] ) {
                         jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
                     }
                 }
             }
             else {
-                if ( value.performed ) {
+                if ( value.performed && currentState != jocManager.statesByName[ "CrouchedState" ] ) {
                     jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
                 }
                 if ( value.canceled ) {
                     if ( CheckCeiling() ) {
                         crouchCanceled = true;
                     }
-                    else {
+                    else if ( currentState != jocManager.statesByName[ "GroundedState" ] ) {
                         jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
                     }
                 }
