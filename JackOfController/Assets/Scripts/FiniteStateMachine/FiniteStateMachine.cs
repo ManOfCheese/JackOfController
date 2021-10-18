@@ -19,6 +19,7 @@ namespace StateMachine {
             if ( CurrentState != null ) {
                 CurrentState.ExitState( Owner );
             }
+            Debug.Log( "Switched from " + CurrentState + " to " + _newState );
             CurrentState = _newState;
             CurrentState.EnterState( Owner );
         }

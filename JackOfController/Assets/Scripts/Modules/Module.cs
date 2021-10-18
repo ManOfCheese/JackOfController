@@ -6,7 +6,7 @@ using StateMachine;
 
 public class Module : MonoBehaviour {
 
-    public JackOfManager JoCManager;
+    public JackOfManager jocManager;
     public string moduleName;
 
     //State

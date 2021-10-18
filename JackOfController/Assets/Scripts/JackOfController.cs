@@ -14,11 +14,11 @@ public enum AerialMovementSettings {
 public class JackOfController : MonoBehaviour {
 
     [Header( "References" )]
-    public StateMachine<JackOfController> stateMachine;
+    public JackOfManager jocManager;
     public CharacterController cc;
     public Camera cam;
 
-    //Camera Settings
+    [Header( "Camera Settings" )]
     [Tooltip( "When true camera controls will be inverted meaning moving left will move the camera to the right." )]
     public bool inverted;
     [Tooltip( "Determines how much the camera moves relative to the input." )]
@@ -49,24 +49,18 @@ public class JackOfController : MonoBehaviour {
     [Tooltip( "How many degrees does the screen tilt." )]
     public float maximumTilt;
 
-    //Movement Settings
+    [Header( "Movement Settings" )]
     [Tooltip("Speed of movement in units per second")]
     public float speed = 5f;
     [Tooltip( "How fast does the player fall" )]
     public float gravity;
     public float stickToGroundForce = 1f;
 
-    //Groundcheck Settings
+    [Header( "Groundcheck Settings" )]
     public float groundDistance;
     public LayerMask groundMask;
 
-    //Jump Settings
-    [Tooltip( "Height of the jump" )]
-    public float jumpHeight = 5f;
-    [Tooltip( "How many times the player can jump" )]
-    public int jumps = 1;
-
-    //Sprint Settings
+    [Header( "Sprint Settings" )]
     [Tooltip( "Is sprinting enabled" )]
     public bool sprintAllowed = true;
     [Tooltip( "Should the FOV momentarily increase when you start sprinting" )]
@@ -80,14 +74,20 @@ public class JackOfController : MonoBehaviour {
     public AnimationCurve startSprintCurve;
     public AnimationCurve endSprintCurve;
 
-    //Aerial Movement Settings
+    [Header( "Jump Settings" )]
+    [Tooltip( "Height of the jump" )]
+    public float jumpHeight = 5f;
+    [Tooltip( "How many times the player can jump" )]
+    public int jumps = 1;
     [Tooltip( "How much freedom of movement should the player have in mid-air?" )]
     public AerialMovementSettings aerialMovement;
     [Tooltip( "How fast can the player change direction in mid-air with limited camera movement" )]
     public float aerialTurnSpeed;
+    public bool midAirSprint;
 
     private PlayerInput playerInput;
     [HideInInspector] public GroundedState groundedState;
+    [HideInInspector] public AirborneState airborneState;
 
     //Camera
     [HideInInspector] public float playerStartHeight;
@@ -101,8 +101,10 @@ public class JackOfController : MonoBehaviour {
     [HideInInspector] public bool jump = false;
     [HideInInspector] public bool grounded = true;
     [HideInInspector] public float currentSpeed;
+    [HideInInspector] public int jumpCount;
     [HideInInspector] public Vector2 rawMovementVector;
     [HideInInspector] public Vector3 velocity;
+    [HideInInspector] public Vector3 velocityOnJump;
 
     private void Awake() {
         playerInput = GetComponent<PlayerInput>();
@@ -111,6 +113,8 @@ public class JackOfController : MonoBehaviour {
 
         groundedState = GroundedState.Instance;
         groundedState.stateName = "GroundedState";
+        airborneState = AirborneState.Instance;
+        airborneState.stateName = "AirborneState";
 
         currentSpeed = speed;
         playerStartHeight = cc.height;
@@ -137,7 +141,7 @@ public class JackOfController : MonoBehaviour {
     }
 
     public void OnJump( InputAction.CallbackContext value ) {
-        if ( value.performed && grounded ) jump = true;
+        if ( value.performed && ( grounded || jumpCount < jumps ) ) jump = true;
     }
 	#endregion
 
@@ -154,18 +158,35 @@ public class JackOfController : MonoBehaviour {
     }
 
     public void Walk() {
-        Vector3 relativeMovementVector = rawMovementVector.x * cc.transform.right + rawMovementVector.y * cc.transform.forward;
-        Vector3 finalMovementVector = new Vector3( relativeMovementVector.x * currentSpeed, velocity.y, relativeMovementVector.z * currentSpeed );
-        cc.Move( finalMovementVector * Time.deltaTime );
+        if ( grounded || aerialMovement == AerialMovementSettings.FullMovement ) {
+            Vector3 relativeMovementVector = rawMovementVector.x * cc.transform.right + rawMovementVector.y * cc.transform.forward;
+            Vector3 finalMovementVector = new Vector3( relativeMovementVector.x * currentSpeed, velocity.y, relativeMovementVector.z * currentSpeed );
+            cc.Move( finalMovementVector * Time.deltaTime );
+        }
     }
 
     public void Jump() {
-        if ( jump && grounded ) {
+        if ( jump && ( grounded || jumpCount < jumps ) ) {
             velocity.y = Mathf.Sqrt( jumpHeight * -2 * gravity );
             jump = false;
+            if ( aerialMovement != AerialMovementSettings.FullMovement ) velocityOnJump = cc.velocity;
+            jumpCount++;
         }
-        cc.Move( velocity * Time.deltaTime );
+        cc.Move( ( velocityOnJump + velocity ) * Time.deltaTime );
     }
+
+    public void LookMove() {
+        if ( aerialMovement == AerialMovementSettings.FullCameraMovement || aerialMovement == AerialMovementSettings.LimitedCameraMovement ) {
+            Vector3 camVector = new Vector3( cam.transform.forward.x, 0f, cam.transform.forward.z );
+
+            if ( aerialMovement == AerialMovementSettings.FullCameraMovement ) {
+                velocityOnJump = camVector * currentSpeed;
+            }
+            if ( aerialMovement == AerialMovementSettings.LimitedCameraMovement ) {
+                velocityOnJump = ( ( ( camVector * aerialTurnSpeed ) + velocityOnJump ) / 2f ).normalized * currentSpeed;
+            }
+        }
+	}
 
     public void Gravity() {
         velocity.y += gravity * Time.deltaTime;
@@ -178,13 +199,26 @@ public class JackOfController : MonoBehaviour {
 
 	#region Checks
 	public void CheckGround() {
+        bool newGrounded;
+
         float radius = cc.height / 4f;
-        grounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, cc.transform.position.z ), 
+        newGrounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, cc.transform.position.z ), 
             groundDistance, groundMask );
+
+        if ( newGrounded != grounded ) {
+            if ( newGrounded ) {
+                jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
+                velocityOnJump = Vector3.zero;
+                jumpCount = 0;
+            }
+            if ( !newGrounded ) jocManager.stateMachine.ChangeState( jocManager.statesByName[ "AirborneState" ] );
+        }
+
+        grounded = newGrounded;
     }
 
     public void CheckSprint() {
-        if ( sprintAllowed ) {
+        if ( sprintAllowed && ( grounded || midAirSprint ) ) {
             if ( sprinting ) {
                 if ( sprintSpeed != 0f )
                     currentSpeed = sprintSpeed;

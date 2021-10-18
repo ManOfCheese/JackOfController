@@ -14,19 +14,19 @@ public class JackOfManager : MonoBehaviour {
 
 	private void Start() {
 		stateMachine = new StateMachine<JackOfManager>( this );
+		joc.jocManager = this;
 
 		Module[] modules = GetComponents<Module>();
 
 		modulesByName = new Dictionary<string, Module>();
 		for ( int i = 0; i < modules.Length; i++ ) {
 			modulesByName.Add( modules[ i ].moduleName, modules[ i ] );
-			modules[ i ].JoCManager = this;
-
-			Debug.Log( modules[ i ].moduleName + " | " + modules[ i ] );
+			modules[ i ].jocManager = this;
 		}
 
 		List<State<JackOfManager>> states = new List<State<JackOfManager>>();
 		states.Add( joc.groundedState );
+		states.Add( joc.airborneState );
 		for ( int i = 0; i < modules.Length; i++ ) {
 			states.Add( modules[ i ].state );
 		}
@@ -34,8 +34,6 @@ public class JackOfManager : MonoBehaviour {
 		statesByName = new Dictionary<string, State<JackOfManager>>();
 		for ( int i = 0; i < states.Count; i++ ) {
 			statesByName.Add( states[ i ].stateName, states[ i ] );
-
-			Debug.Log( states[ i ].stateName + " | " + states[ i ] );
 		}
 
 		stateMachine.ChangeState( statesByName[ "GroundedState" ] );

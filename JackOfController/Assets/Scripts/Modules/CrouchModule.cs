@@ -27,41 +27,43 @@ public class CrouchModule : Module {
 	}
 
 	public void OnCrouch( InputAction.CallbackContext value ) {
-        if ( toggleCrouch ) {
-            bool newCrouching = !crouching;
+        if ( jocManager.stateMachine.CurrentState != jocManager.statesByName[ "AirborneState" ] ) {
+            if ( toggleCrouch ) {
+                bool newCrouching = !crouching;
 
-            if ( newCrouching ) {
-                JoCManager.stateMachine.ChangeState( JoCManager.statesByName[ "CrouchedState" ] );
-            }
-			else {
-                if ( CheckCeiling() ) {
-                    crouchCanceled = true;
-				}
-				else {
-                    JoCManager.stateMachine.ChangeState( JoCManager.statesByName[ "GroundedState" ] );
-                }
-			}
-        }
-        else {
-            if ( value.performed ) {
-                JoCManager.stateMachine.ChangeState( JoCManager.statesByName[ "CrouchedState" ] );
-            }
-            if ( value.canceled ) {
-                if ( CheckCeiling() ) {
-                    crouchCanceled = true;
+                if ( newCrouching ) {
+                    jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
                 }
                 else {
-                    JoCManager.stateMachine.ChangeState( JoCManager.statesByName[ "GroundedState" ] );
+                    if ( CheckCeiling() ) {
+                        crouchCanceled = true;
+                    }
+                    else {
+                        jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
+                    }
+                }
+            }
+            else {
+                if ( value.performed ) {
+                    jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
+                }
+                if ( value.canceled ) {
+                    if ( CheckCeiling() ) {
+                        crouchCanceled = true;
+                    }
+                    else {
+                        jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
+                    }
                 }
             }
         }
     }
 
     public bool CheckCeiling() {
-        float radius = JoCManager.joc.playerStartHeight / 4f;
-        return Physics.CheckSphere( new Vector3( JoCManager.joc.cc.transform.position.x, 
-            JoCManager.joc.cc.transform.position. y + ( radius * 2f ),
-            JoCManager.joc.transform.position.z ), radius, JoCManager.joc.groundMask );
+        float radius = jocManager.joc.playerStartHeight / 4f;
+        return Physics.CheckSphere( new Vector3( jocManager.joc.cc.transform.position.x, 
+            jocManager.joc.cc.transform.position. y + ( radius * 2f ),
+            jocManager.joc.transform.position.z ), radius, jocManager.joc.groundMask );
     }
 
 }

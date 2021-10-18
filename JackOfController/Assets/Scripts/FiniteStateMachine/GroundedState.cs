@@ -37,8 +37,8 @@ public class GroundedState : State<JackOfManager> {
 		_owner.joc.CheckSprint();
 		_owner.joc.Walk();
 		_owner.joc.Gravity();
-		_owner.joc.CheckGround();
 		_owner.joc.Jump();
+		_owner.joc.CheckGround();
 	}
 
 	public override void ExitState( JackOfManager _owner ) {
