@@ -626,8 +626,8 @@ GameObject:
   - component: {fileID: 1383978425}
   - component: {fileID: 1383978424}
   - component: {fileID: 1383978427}
-  - component: {fileID: 1383978428}
   - component: {fileID: 1383978429}
+  - component: {fileID: 1383978428}
   - component: {fileID: 1383978426}
   m_Layer: 0
   m_Name: JackOfController_Logic
@@ -662,9 +662,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f7f89688eaafc548a243abb5becf992, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jocManager: {fileID: 0}
-  cc: {fileID: 760179238}
-  cam: {fileID: 963194227}
+  system: {fileID: 11400000, guid: 4d2e3da3703b28c4690ced6f20283731, type: 2}
+  jom: {fileID: 0}
   inverted: 0
   sensitivity: 0.419
   xRotationLimitsUp: -90
@@ -693,13 +692,14 @@ MonoBehaviour:
   jumps: 2
   aerialMovement: 0
   aerialTurnSpeed: 0.2
-  midAirSprint: 1
+  midAirSprint: 0
   groundDistance: 0.55
   groundMask:
     serializedVersion: 2
     m_Bits: 256
-  groundedState: {fileID: 0}
-  airborneState: {fileID: 0}
+  cam: {fileID: 963194227}
+  cc: {fileID: 760179238}
+  playerInput: {fileID: 0}
   playerStartHeight: 0
   camStartHeight: 0
   sprinting: 0
@@ -726,7 +726,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd3fb27667a430488f7741bc2f2ba50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  system: {fileID: 11400000, guid: f5217d24e09e47d4e9b40dab5951e334, type: 2}
+  systemInitOrder:
+  - {fileID: 11400000, guid: 4d2e3da3703b28c4690ced6f20283731, type: 2}
+  - {fileID: 11400000, guid: af1063a4d3dd9dc47961dc02a74d9c6f, type: 2}
+  - {fileID: 11400000, guid: 3e2266249f2d49349ba7d99331ec9e08, type: 2}
+  - {fileID: 11400000, guid: f5217d24e09e47d4e9b40dab5951e334, type: 2}
+  systemUpdateOrder:
+  - {fileID: 11400000, guid: af1063a4d3dd9dc47961dc02a74d9c6f, type: 2}
+  - {fileID: 11400000, guid: 3e2266249f2d49349ba7d99331ec9e08, type: 2}
+  - {fileID: 11400000, guid: f5217d24e09e47d4e9b40dab5951e334, type: 2}
+  currentState: 
   joc: {fileID: 1383978424}
+  cam: {fileID: 0}
+  cc: {fileID: 0}
 --- !u!114 &1383978426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -858,7 +871,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jocManager: {fileID: 0}
   moduleName: CrouchModule
-  toggleCrouch: 0
+  toggleCrouch: 1
   crouchCamHeight: 0.5
   crouchPlayerHeight: 0.8
   crouchSpeed: 0
@@ -879,8 +892,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jocManager: {fileID: 0}
   moduleName: ScreenTiltModule
+  system: {fileID: 11400000, guid: 3e2266249f2d49349ba7d99331ec9e08, type: 2}
   maximumTilt: 2
   tiltSpeed: 30
+  rawMovementVector: {x: 0, y: 0}
+  tilt: 0
 --- !u!114 &1383978429
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -895,8 +911,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   jocManager: {fileID: 0}
   moduleName: HeadBobModule
+  system: {fileID: 11400000, guid: af1063a4d3dd9dc47961dc02a74d9c6f, type: 2}
+  adjustSpeedWhenSprinting: 1
   headBobSpeed: 5
   headBobIntensity: 0.2
+  currentHeadBobSpeed: 0
 --- !u!1 &1562725415
 GameObject:
   m_ObjectHideFlags: 0

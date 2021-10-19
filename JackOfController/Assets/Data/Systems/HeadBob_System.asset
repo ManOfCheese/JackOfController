@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 920814965fdc5c44aad9b581befb15c2, type: 3}
-  m_Name: GroundedState
+  m_Script: {fileID: 11500000, guid: b30a2ee68bcabae4cafb6051606e04e7, type: 3}
+  m_Name: HeadBob_System
   m_EditorClassIdentifier: 
-  stateName: GroundedState
+  hbm: {fileID: 0}

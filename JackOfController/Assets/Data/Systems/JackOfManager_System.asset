@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e37d27b10cd74ae44a2462a3e16ba27d, type: 3}
-  m_Name: CrouchedState
+  m_Script: {fileID: 11500000, guid: f7fec956b03e39149965e95f6bc5e2b9, type: 3}
+  m_Name: JackOfManager_System
   m_EditorClassIdentifier: 
-  stateName: CrouchedState
+  jom: {fileID: 0}

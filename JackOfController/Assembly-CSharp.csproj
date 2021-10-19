@@ -69,12 +69,17 @@
     <Compile Include="Assets\Scripts\FiniteStateMachine\FiniteStateMachine.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\GroundedState.cs" />
     <Compile Include="Assets\Scripts\JackOfController.cs" />
+    <Compile Include="Assets\Scripts\JackOfControllerSystem.cs" />
     <Compile Include="Assets\Scripts\JackOfManager.cs" />
+    <Compile Include="Assets\Scripts\JackOfManagerSystem.cs" />
     <Compile Include="Assets\Scripts\Modules\CrouchModule.cs" />
     <Compile Include="Assets\Scripts\Modules\HeadBobModule.cs" />
+    <Compile Include="Assets\Scripts\Modules\HeadBobSystem.cs" />
     <Compile Include="Assets\Scripts\Modules\Module.cs" />
     <Compile Include="Assets\Scripts\Modules\ScreenTiltModule.cs" />
+    <Compile Include="Assets\Scripts\Modules\ScreenTiltSystem.cs" />
     <Compile Include="Assets\Scripts\ReadOnlyAttribute.cs" />
+    <Compile Include="Assets\Scripts\VariableObjects\ComponentSystem.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\PersistentSet.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\PersistentSetElement.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\SetTypes\BoolValue_Set.cs" />

@@ -32,11 +32,11 @@ public class CrouchedState : State<JackOfManager> {
 		JackOfController joc = _owner.joc;
 		CrouchModule cm = _owner.modulesByName[ "CrouchModule" ] as CrouchModule;
 
-		_owner.joc.cam.transform.localPosition = new Vector3( _owner.joc.cam.transform.localPosition.x, cm.crouchCamHeight, 
-			_owner.joc.cam.transform.localPosition.z );
+		_owner.cam.transform.localPosition = new Vector3( _owner.cam.transform.localPosition.x, cm.crouchCamHeight, 
+			_owner.cam.transform.localPosition.z );
 		joc.currentCamHeight = cm.crouchCamHeight;
-		joc.cc.height = cm.crouchPlayerHeight;
-		joc.cc.Move( Vector3.down );
+		_owner.cc.height = cm.crouchPlayerHeight;
+		_owner.cc.Move( Vector3.down );
 
 		if ( cm.crouchSpeed != 0f )
 			_owner.joc.currentSpeed = cm.crouchSpeed;
@@ -60,10 +60,10 @@ public class CrouchedState : State<JackOfManager> {
 	}
 
 	public override void ExitState( JackOfManager _owner ) {
-		_owner.joc.cam.transform.localPosition = new Vector3( _owner.joc.cam.transform.localPosition.x,
-			_owner.joc.camStartHeight, _owner.joc.cam.transform.localPosition.z );
+		_owner.cam.transform.localPosition = new Vector3( _owner.cam.transform.localPosition.x,
+			_owner.joc.camStartHeight, _owner.cam.transform.localPosition.z );
 		_owner.joc.currentCamHeight = _owner.joc.camStartHeight;
-		_owner.joc.cc.height = _owner.joc.playerStartHeight;
+		_owner.cc.height = _owner.joc.playerStartHeight;
 		_owner.joc.currentSpeed = _owner.joc.speed;
 	}
 }

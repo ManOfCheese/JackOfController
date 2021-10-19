@@ -63,8 +63,8 @@ public class CrouchModule : Module {
 
     public bool CheckCeiling() {
         float radius = jocManager.joc.playerStartHeight / 4f;
-        return Physics.CheckSphere( new Vector3( jocManager.joc.cc.transform.position.x, 
-            jocManager.joc.cc.transform.position. y + ( radius * 2f ),
+        return Physics.CheckSphere( new Vector3( jocManager.cc.transform.position.x, 
+            jocManager.cc.transform.position. y + ( radius * 2f ),
             jocManager.joc.transform.position.z ), radius, jocManager.joc.groundMask );
     }
 

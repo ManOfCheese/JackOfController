@@ -31,7 +31,7 @@ namespace StateMachine {
         }
     }
 
-    public abstract class State<T> : ScriptableObject {
+    public abstract class State<T> {
         public string stateName;
         public abstract void EnterState( T _owner );
         public abstract void ExitState( T _owner );

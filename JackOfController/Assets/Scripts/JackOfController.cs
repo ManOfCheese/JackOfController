@@ -12,10 +12,9 @@ public enum AerialMovementSettings {
 
 public class JackOfController : MonoBehaviour {
 
-    [Header( "References" )]
-    public JackOfManager jocManager;
-    public CharacterController cc;
-    public Camera cam;
+    public JackOfControllerSystem system;
+
+    [HideInInspector] public JackOfManager jom;
 
     [Header( "Camera Settings" )]
     [Tooltip( "When true camera controls will be inverted meaning moving left will move the camera to the right." )]
@@ -64,7 +63,9 @@ public class JackOfController : MonoBehaviour {
     public float groundDistance;
     public LayerMask groundMask;
 
-    private PlayerInput playerInput;
+    [HideInInspector] public Camera cam;
+    [HideInInspector] public CharacterController cc;
+    [HideInInspector] public PlayerInput playerInput;
     [HideInInspector] public GroundedState groundedState;
     [HideInInspector] public AirborneState airborneState;
 
@@ -87,20 +88,7 @@ public class JackOfController : MonoBehaviour {
     [ReadOnly] public Vector3 velocityOnJump;
 
     private void Awake() {
-        playerInput = GetComponent<PlayerInput>();
-        playerInput.ActivateInput();
-        playerInput.SwitchCurrentActionMap( "PlayerControls" );
-
-        groundedState = GroundedState.Instance;
-        groundedState.stateName = "GroundedState";
-        airborneState = AirborneState.Instance;
-        airborneState.stateName = "AirborneState";
-
-        currentSpeed = speed;
-        playerStartHeight = cc.height;
-        camStartHeight = cam.transform.localPosition.y;
-        currentCamHeight = camStartHeight;
-        Cursor.lockState = CursorLockMode.Locked;
+        system.joc = this;
     }
 
     #region Input
@@ -135,7 +123,8 @@ public class JackOfController : MonoBehaviour {
         yCamRotation %= 360;
         xCamRotation = Mathf.Clamp( xCamRotation, xRotationLimitsUp, xRotationLimitsDown );
         cam.transform.eulerAngles = new Vector3( xCamRotation, yCamRotation, cam.transform.eulerAngles.z );
-        cc.transform.eulerAngles = new Vector3( cc.transform.eulerAngles.x, yCamRotation, cc.transform.eulerAngles.z );
+        cc.transform.eulerAngles = new Vector3( jom.cc.transform.eulerAngles.x, yCamRotation, 
+            cc.transform.eulerAngles.z );
     }
 
     public void Walk() {
@@ -187,21 +176,14 @@ public class JackOfController : MonoBehaviour {
         newGrounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, cc.transform.position.z ), 
             groundDistance, groundMask );
 
-        //if ( radius < 0.25f ) {
-        //    Debug.Log( cc.transform.position.y );
-        //    Debug.Log( cc.height );
-        //    Debug.Log( radius );
-        //    Debug.Log( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, cc.transform.position.z ) );
-        //}
-
         if ( newGrounded != grounded ) {
-            if ( newGrounded && jocManager.stateMachine.CurrentState != jocManager.statesByName[ "GroundedState" ] ) {
-                jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
+            if ( newGrounded && jom.stateMachine.CurrentState != jom.statesByName[ "GroundedState" ] ) {
+                jom.stateMachine.ChangeState( jom.statesByName[ "GroundedState" ] );
                 velocityOnJump = Vector3.zero;
                 jumpCount = 0;
             }
-            if ( !newGrounded && jocManager.stateMachine.CurrentState != jocManager.statesByName[ "AirborneState" ] ) 
-                jocManager.stateMachine.ChangeState( jocManager.statesByName[ "AirborneState" ] );
+            if ( !newGrounded && jom.stateMachine.CurrentState != jom.statesByName[ "AirborneState" ] ) 
+                jom.stateMachine.ChangeState( jom.statesByName[ "AirborneState" ] );
         }
 
         grounded = newGrounded;
