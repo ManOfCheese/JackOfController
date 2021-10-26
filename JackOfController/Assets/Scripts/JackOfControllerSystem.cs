@@ -26,6 +26,19 @@ public class JackOfControllerSystem : ComponentSystem {
         joc.camStartHeight = joc.jom.cam.transform.localPosition.y;
         joc.currentCamHeight = joc.camStartHeight;
         Cursor.lockState = CursorLockMode.Locked;
+
+        if ( joc.sprintSpeed != 0f )
+            joc.rSprintSpeed = joc.sprintSpeed;
+        else
+            joc.rSprintSpeed = joc.speed * joc.relativeSprintSpeed;
+
+
     }
+
+	public override void OnUpdate() {
+		if ( joc.jom.currentState != joc.jom.statesByName[ "GroundedState" ].stateName ) {
+            joc.sprinting = false;
+		}
+	}
 
 }

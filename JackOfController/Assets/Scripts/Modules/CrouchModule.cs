@@ -6,12 +6,13 @@ using StateMachine;
 
 public class CrouchModule : Module {
 
+    public bool sprintCrouch;
     [Tooltip( "Toggle crouch or hold to crouch" )]
     public bool toggleCrouch = false;
     [Tooltip( "The height of the camera when crouching" )]
     public float crouchCamHeight = 0.5f;
     [Tooltip( "The height of the player (for collisions) while crouching" )]
-    public float crouchPlayerHeight;
+    public float crouchPlayerHeight = 0.8f;
     [Tooltip( "How fast is the player when crouching?" )]
     public float crouchSpeed = 0f;
     [Tooltip( "How much slower or faster is the player while crouching, only used if crouchSpeed is 0" )]
@@ -34,28 +35,26 @@ public class CrouchModule : Module {
                 bool newCrouching = !crouching;
 
                 if ( newCrouching && currentState != jocManager.statesByName[ "CrouchedState" ] ) {
-                    jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
+                    if ( sprintCrouch || !jocManager.joc.sprinting )
+                        jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
                 }
                 else {
-                    if ( CheckCeiling() ) {
+                    if ( CheckCeiling() )
                         crouchCanceled = true;
-                    }
-                    else if ( newCrouching && currentState != jocManager.statesByName[ "GroundedState" ] ) {
+                    else if ( newCrouching && currentState != jocManager.statesByName[ "GroundedState" ] )
                         jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
-                    }
                 }
             }
             else {
                 if ( value.performed && currentState != jocManager.statesByName[ "CrouchedState" ] ) {
-                    jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
+                    if ( sprintCrouch || !jocManager.joc.sprinting )
+                        jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
                 }
                 if ( value.canceled ) {
-                    if ( CheckCeiling() ) {
+                    if ( CheckCeiling() )
                         crouchCanceled = true;
-                    }
-                    else if ( currentState != jocManager.statesByName[ "GroundedState" ] ) {
+                    else if ( currentState != jocManager.statesByName[ "GroundedState" ] )
                         jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
-                    }
                 }
             }
         }

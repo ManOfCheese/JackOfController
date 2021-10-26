@@ -68,6 +68,7 @@
     <Compile Include="Assets\Scripts\FiniteStateMachine\CrouchedState.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\FiniteStateMachine.cs" />
     <Compile Include="Assets\Scripts\FiniteStateMachine\GroundedState.cs" />
+    <Compile Include="Assets\Scripts\FiniteStateMachine\SlideState.cs" />
     <Compile Include="Assets\Scripts\JackOfController.cs" />
     <Compile Include="Assets\Scripts\JackOfControllerSystem.cs" />
     <Compile Include="Assets\Scripts\JackOfManager.cs" />
@@ -78,6 +79,8 @@
     <Compile Include="Assets\Scripts\Modules\Module.cs" />
     <Compile Include="Assets\Scripts\Modules\ScreenTiltModule.cs" />
     <Compile Include="Assets\Scripts\Modules\ScreenTiltSystem.cs" />
+    <Compile Include="Assets\Scripts\Modules\SlideModule.cs" />
+    <Compile Include="Assets\Scripts\Modules\SlideSystem.cs" />
     <Compile Include="Assets\Scripts\ReadOnlyAttribute.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\ComponentSystem.cs" />
     <Compile Include="Assets\Scripts\VariableObjects\PersistentSet.cs" />

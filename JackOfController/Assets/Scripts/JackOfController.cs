@@ -10,6 +10,12 @@ public enum AerialMovementSettings {
     NoMovement
 }
 
+public enum SprintMode {
+    HoldToSprint,
+    ToggleSprint,
+    SinglePressSprint
+}
+
 public class JackOfController : MonoBehaviour {
 
     public JackOfControllerSystem system;
@@ -31,18 +37,15 @@ public class JackOfController : MonoBehaviour {
     [Tooltip("Speed of movement in units per second")]
     public float speed = 5f;
     [Tooltip( "How fast does the player fall" )]
-    public float gravity;
-    public float stickToGroundForce = 1f;
+    public float gravity = -9.81f;
+    public float stickToGroundForce = 10f;
 
     [Header( "Sprint Settings" )]
     [Tooltip( "Is sprinting enabled" )]
     public bool sprintAllowed = true;
-    [Tooltip( "Should the FOV momentarily increase when you start sprinting" )]
-    public bool FOVBurst = true;
-    [Tooltip( "Should the FOV increase when you start sprinting" )]
-    public bool FOVBoost = true;
+    public SprintMode sprintMode;
     [Tooltip( "Sprinting speed in units per second" )]
-    public float sprintSpeed = 10f;
+    public float sprintSpeed = 0f;
     [Tooltip( "Sprinting speed relative to the walking speed" )]
     public float relativeSprintSpeed = 2f;
     public AnimationCurve startSprintCurve;
@@ -63,6 +66,7 @@ public class JackOfController : MonoBehaviour {
     public float groundDistance;
     public LayerMask groundMask;
 
+    [HideInInspector] public float rSprintSpeed; 
     [HideInInspector] public Camera cam;
     [HideInInspector] public CharacterController cc;
     [HideInInspector] public PlayerInput playerInput;
@@ -74,6 +78,7 @@ public class JackOfController : MonoBehaviour {
     [ReadOnly] public float camStartHeight;
 
     //Runtime
+    [ReadOnly] public bool moving = false;
     [ReadOnly] public bool sprinting = false;
     [ReadOnly] public bool jump = false;
     [ReadOnly] public bool grounded = true;
@@ -81,11 +86,15 @@ public class JackOfController : MonoBehaviour {
     [ReadOnly] public float currentCamHeight;
     [ReadOnly] public float xCamRotation = 0.0f;
     [ReadOnly] public float yCamRotation = 0.0f;
-    [ReadOnly] public int jumpCount;
     [ReadOnly] public Vector2 lookVector;
     [ReadOnly] public Vector2 rawMovementVector;
     [ReadOnly] public Vector3 velocity;
     [ReadOnly] public Vector3 velocityOnJump;
+
+    private bool sprintStart = false;
+    private bool sprintEnd = false;
+    private bool sprintToggle = false;
+    private int jumpCount;
 
     private void Awake() {
         system.joc = this;
@@ -99,13 +108,19 @@ public class JackOfController : MonoBehaviour {
 
     public void OnMove( InputAction.CallbackContext value ) {
         rawMovementVector = value.ReadValue<Vector2>();
+        if ( value.started )
+            moving = true;
+        if ( value.canceled )
+            moving = false;
     }
 
     public void OnSprint( InputAction.CallbackContext value ) {
-        if ( value.started ) sprinting = true;
+        if ( value.started ) {
+            sprintStart = true;
+            sprintToggle = true;
+        }
         if ( value.canceled ) {
-            sprinting = false;
-            currentSpeed = speed;
+            sprintEnd = true;
         }
     }
 
@@ -165,6 +180,7 @@ public class JackOfController : MonoBehaviour {
 
     public void StickToGround() {
         velocity.y = stickToGroundForce;
+        cc.Move( velocity );
     }
 	#endregion
 
@@ -191,15 +207,54 @@ public class JackOfController : MonoBehaviour {
 
     public void CheckSprint() {
         if ( sprintAllowed && ( grounded || midAirSprint ) ) {
-            if ( sprinting ) {
-                if ( sprintSpeed != 0f )
-                    currentSpeed = sprintSpeed;
-                else
-                    currentSpeed = speed * relativeSprintSpeed;
+            if ( sprintMode == SprintMode.HoldToSprint ) {
+                if ( sprintStart ) {
+                    sprintStart = false;
+                    StartSprint();
+                }
+                else if ( sprintEnd ) {
+                    sprintEnd = false;
+                    EndSprint();
+                }
+			}
+            else if ( sprintMode == SprintMode.SinglePressSprint ) {
+                if ( sprintStart ) {
+                    sprintStart = false;
+                    StartSprint();
+                }
+                else if ( !moving ) {
+                    EndSprint();
+				}
+            }
+            else if ( sprintMode == SprintMode.ToggleSprint ) {
+                if ( sprintToggle ) {
+                    bool newSprinting = !sprinting;
+                    sprintToggle = false;
+
+                    if ( newSprinting ) {
+                        StartSprint();
+                    }
+					else {
+                        EndSprint();
+                    }
+                }
             }
         }
     }
 	#endregion
+
+    public void StartSprint() {
+        sprinting = true;
+        if ( sprintSpeed != 0f )
+            currentSpeed = sprintSpeed;
+        else
+            currentSpeed = speed * relativeSprintSpeed;
+    }
+
+    public void EndSprint() {
+        sprinting = false;
+        currentSpeed = speed;
+    }
 
 	public void OnDrawGizmos() {
         float radius = playerStartHeight / 4;

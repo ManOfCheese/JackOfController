@@ -238,7 +238,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 760179236}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 88, y: 1, z: 80}
+  m_LocalPosition: {x: 260, y: 53.6, z: 151.5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1935867882}
@@ -625,9 +625,9 @@ GameObject:
   - component: {fileID: 1383978423}
   - component: {fileID: 1383978425}
   - component: {fileID: 1383978424}
-  - component: {fileID: 1383978427}
   - component: {fileID: 1383978429}
   - component: {fileID: 1383978428}
+  - component: {fileID: 1383978430}
   - component: {fileID: 1383978426}
   m_Layer: 0
   m_Name: JackOfController_Logic
@@ -672,8 +672,7 @@ MonoBehaviour:
   gravity: -9.81
   stickToGroundForce: -10
   sprintAllowed: 1
-  FOVBurst: 0
-  FOVBoost: 0
+  sprintMode: 1
   sprintSpeed: 0
   relativeSprintSpeed: 2
   startSprintCurve:
@@ -697,11 +696,13 @@ MonoBehaviour:
   groundMask:
     serializedVersion: 2
     m_Bits: 256
+  rSprintSpeed: 0
   cam: {fileID: 963194227}
   cc: {fileID: 760179238}
   playerInput: {fileID: 0}
   playerStartHeight: 0
   camStartHeight: 0
+  moving: 0
   sprinting: 0
   jump: 0
   grounded: 1
@@ -709,7 +710,6 @@ MonoBehaviour:
   currentCamHeight: 0
   xCamRotation: 0
   yCamRotation: 0
-  jumpCount: 0
   lookVector: {x: 0, y: 0}
   rawMovementVector: {x: 0, y: 0}
   velocity: {x: 0, y: 0, z: 0}
@@ -732,9 +732,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: af1063a4d3dd9dc47961dc02a74d9c6f, type: 2}
   - {fileID: 11400000, guid: 3e2266249f2d49349ba7d99331ec9e08, type: 2}
   - {fileID: 11400000, guid: f5217d24e09e47d4e9b40dab5951e334, type: 2}
+  - {fileID: 11400000, guid: df7910b8cde01f744b9b615fe5de760a, type: 2}
   systemUpdateOrder:
+  - {fileID: 11400000, guid: 4d2e3da3703b28c4690ced6f20283731, type: 2}
   - {fileID: 11400000, guid: af1063a4d3dd9dc47961dc02a74d9c6f, type: 2}
   - {fileID: 11400000, guid: 3e2266249f2d49349ba7d99331ec9e08, type: 2}
+  - {fileID: 11400000, guid: df7910b8cde01f744b9b615fe5de760a, type: 2}
   - {fileID: 11400000, guid: f5217d24e09e47d4e9b40dab5951e334, type: 2}
   currentState: 
   joc: {fileID: 1383978424}
@@ -824,8 +827,19 @@ MonoBehaviour:
     m_ActionName: Standard/Jump[/Keyboard/space]
   - m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1383978427}
+      - m_Target: {fileID: 0}
         m_MethodName: OnCrouch
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1383978430}
+        m_MethodName: OnSlide
         m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -857,27 +871,6 @@ MonoBehaviour:
   m_DefaultActionMap: PlayerControls
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!114 &1383978427
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1383978422}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8732bb2b16044ac4991436aa77f4b9af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jocManager: {fileID: 0}
-  moduleName: CrouchModule
-  toggleCrouch: 1
-  crouchCamHeight: 0.5
-  crouchPlayerHeight: 0.8
-  crouchSpeed: 0
-  relativeCrouchSpeed: 0.5
-  crouching: 0
-  crouchCanceled: 0
 --- !u!114 &1383978428
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -916,6 +909,51 @@ MonoBehaviour:
   headBobSpeed: 5
   headBobIntensity: 0.2
   currentHeadBobSpeed: 0
+--- !u!114 &1383978430
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1383978422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc9c50bdb1f846b49885b78b1d1accc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jocManager: {fileID: 0}
+  moduleName: SlideModule
+  system: {fileID: 11400000, guid: df7910b8cde01f744b9b615fe5de760a, type: 2}
+  slideMode: 1
+  slopeBasedSpeed: 0
+  slideSpeed: 0
+  relativeSlideSpeed: 2
+  minSlopeAngle: 10
+  maxSlopeAngle: 60
+  speedLoss: 20
+  slideCameHeight: 0.5
+  slidePlayerHeight: 0.8
+  slopeBoostMin: 1
+  slopeBoostMax: 5
+  showDebug: 1
+  castingMask:
+    serializedVersion: 2
+    m_Bits: 256
+  startDistanceFromBottom: 0.2
+  sphereCastRadius: 0.25
+  sphereCastDistance: 0.75
+  raycastLength: 0.75
+  rayOriginOffset1: {x: -0.2, y: 0, z: 0.16}
+  rayOriginOffset2: {x: 0.2, y: 0, z: -0.16}
+  slopeCheckOrigin: {x: 0, y: 0, z: 0}
+  rSlideSpeed: 0
+  currentSlideSpeed: 0
+  slideStartVelocity: {x: 0, y: 0, z: 0}
+  adjustedStartVelocity: {x: 0, y: 0, z: 0}
+  slideDir: {x: 0, y: 0, z: 0}
+  slopeDir: {x: 0, y: 0, z: 0}
+  groundSlopeAngle: 0
+  sliding: 0
 --- !u!1 &1562725415
 GameObject:
   m_ObjectHideFlags: 0
