@@ -32,7 +32,9 @@ public class SlideModule : Module {
 	public float slideCameHeight = 0.5f;
 	[Tooltip( "The height of the player while sliding." )]
 	public float slidePlayerHeight = 0.8f;
+	[Tooltip( "The speed multiplier applied when the slope is equal to or lower than the minSlopeAngle." )]
 	public float slopeBoostMin = 1f;
+	[Tooltip( "The speed multiplier applied when the slope is equal to or lower than the maxSlopeAngle." )]
 	public float slopeBoostMax = 2f;
 
 	[Header( "SlopeCheck Settings" )]
