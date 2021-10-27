@@ -3,32 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using StateMachine;
 
-public class SlideState : State<JackOfManager> {
+[CreateAssetMenu( fileName = "SlideState", menuName = "States/SlideState" )]
+public class SlideState : State {
 
-	#region singleton
-	//Create a single instance of this state for all state machines.
-	private static SlideState _instance;
-
-	private SlideState() {
-		if ( _instance != null ) {
-			return;
-		}
-
-		_instance = this;
-	}
-
-	public static SlideState Instance {
-		get {
-			if ( _instance == null ) {
-				new SlideState();
-			}
-
-			return _instance;
-		}
-	}
-	#endregion
-
-	public override void EnterState( JackOfManager _owner ) {
+	public override void EnterState() {
 		JackOfController joc = _owner.joc;
 		SlideModule sm = _owner.modulesByName[ "SlideModule" ] as SlideModule;
 
@@ -45,7 +23,7 @@ public class SlideState : State<JackOfManager> {
 			if ( _owner.joc.sprintSpeed != 0f )
 				_owner.joc.currentSpeed = _owner.joc.sprintSpeed * sm.relativeSlideSpeed;
 			else
-				_owner.joc.currentSpeed = _owner.joc.speed * _owner.joc.relativeSprintSpeed * sm.relativeSlideSpeed;
+				_owner.joc.currentSpeed = _owner.joc.walkSpeed * _owner.joc.relativeSprintSpeed * sm.relativeSlideSpeed;
 		}
 
 		sm.slideStartVelocity = new Vector3( _owner.cc.transform.forward.x, 0f, _owner.cc.transform.forward.z ).normalized * sm.rSlideSpeed;
@@ -54,23 +32,27 @@ public class SlideState : State<JackOfManager> {
 		sm.currentSlideSpeed = sm.rSlideSpeed;
 	}
 
-	public override void UpdateState( JackOfManager _owner ) {
+	public override void UpdateState() {
 		SlideModule sm = _owner.modulesByName[ "SlideModule" ] as SlideModule;
 
-		_owner.joc.CameraLook();
-		sm.Slide();
-		_owner.joc.StickToGround();
-		_owner.joc.CheckGround();
-		sm.CheckSlope();
-		if ( sm.groundSlopeAngle < sm.minSlopeAngle ) {
+		for ( int i = 0; i < functionsToUpdate.Length; i++ ) {
+			functionsToUpdate[ i ].ExecuteFunction();
+		}
+
+		//_owner.joc.CameraLook();
+		//sm.Slide();
+		//_owner.joc.StickToGround();
+		//_owner.joc.CheckGround();
+		//sm.CheckSlope();
+		if ( sm.groundSlopeAngle < sm.slopeAngleRange.x ) {
 			sm.currentSlideSpeed -= sm.speedLoss * Time.deltaTime;
 		}
-		if ( _owner.joc.currentSpeed < _owner.joc.speed && sm.groundSlopeAngle < sm.minSlopeAngle ) {
+		if ( _owner.joc.currentSpeed < _owner.joc.walkSpeed && sm.groundSlopeAngle < sm.minSlopeAngle ) {
 			_owner.stateMachine.ChangeState( _owner.statesByName[ "GroundedState" ] );
 		}
 	}
 
-	public override void ExitState( JackOfManager _owner ) {
+	public override void ExitState() {
 		Debug.Log( "Exiting Slide" );
 		_owner.cam.transform.localPosition = new Vector3( _owner.cam.transform.localPosition.x,
 			_owner.joc.camStartHeight, _owner.cam.transform.localPosition.z );
@@ -80,7 +62,7 @@ public class SlideState : State<JackOfManager> {
 			_owner.joc.StartSprint();
 		}
 		else {
-			_owner.joc.currentSpeed = _owner.joc.speed;
+			_owner.joc.currentSpeed = _owner.joc.walkSpeed;
 		}
 		_owner.joc.sprinting = false;
 	}

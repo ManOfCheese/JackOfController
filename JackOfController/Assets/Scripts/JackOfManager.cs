@@ -10,21 +10,29 @@ public class JackOfManager : MonoBehaviour {
 	public ComponentSystem[] systemInitOrder;
 	public ComponentSystem[] systemUpdateOrder;
 
+	//Startup
+	[ReadOnly] public float playerStartHeight;
+	[ReadOnly] public float camStartHeight;
+
+	//Runtime
+	[ReadOnly] public float currentSpeed;
+	[ReadOnly] public float currentCamHeight;
+	[ReadOnly] public float currentPlayerHeight;
 	[ReadOnly] public string currentState;
 
 	[HideInInspector] public JackOfController joc;
 	[HideInInspector] public Camera cam;
 	[HideInInspector] public CharacterController cc;
-	[HideInInspector] public StateMachine<JackOfManager> stateMachine;
+	[HideInInspector] public FiniteStateMachine stateMachine;
 	[HideInInspector] public Dictionary<string, Module> modulesByName;
-	[HideInInspector] public Dictionary<string, State<JackOfManager>> statesByName;
+	[HideInInspector] public Dictionary<string, State> statesByName;
 
 	private void Awake() {
 		system.jom = this;
 		joc.jom = this;
 		cam = transform.parent.GetComponentInChildren<Camera>();
 		cc = transform.parent.GetComponent<CharacterController>();
-		stateMachine = new StateMachine<JackOfManager>( this );
+		stateMachine = new FiniteStateMachine();
 	}
 
 	private void Start() {

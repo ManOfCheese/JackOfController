@@ -14,7 +14,7 @@ public class JackOfManagerSystem : ComponentSystem {
 		jom.modulesByName = new Dictionary<string, Module>();
 		for ( int i = 0; i < modules.Length; i++ ) {
 			jom.modulesByName.Add( modules[ i ].moduleName, modules[ i ] );
-			modules[ i ].jocManager = jom;
+			modules[ i ].jom = jom;
 		}
 
 		List<State<JackOfManager>> states = new List<State<JackOfManager>>();

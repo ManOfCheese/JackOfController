@@ -13,12 +13,12 @@ public class HeadBobSystem : ComponentSystem {
 
 	public override void OnUpdate() {
 		if ( hbm.adjustSpeedWhenSprinting ) {
-			if ( hbm.jocManager.joc.sprinting ) {
+			if ( hbm.jom.joc.sprinting ) {
 				float speedDifferential;
-				if ( hbm.jocManager.joc.relativeSprintSpeed != 0 )
-					speedDifferential = hbm.jocManager.joc.speed * hbm.jocManager.joc.relativeSprintSpeed / hbm.jocManager.joc.speed;
+				if ( hbm.jom.joc.relativeSprintSpeed != 0 )
+					speedDifferential = hbm.jom.joc.walkSpeed * hbm.jom.joc.relativeSprintSpeed / hbm.jom.joc.walkSpeed;
 				else
-					speedDifferential = hbm.jocManager.joc.sprintSpeed / hbm.jocManager.joc.speed;
+					speedDifferential = hbm.jom.joc.sprintSpeed / hbm.jom.joc.walkSpeed;
 
 				hbm.currentHeadBobSpeed = hbm.headBobSpeed * speedDifferential;
 			}
@@ -27,10 +27,10 @@ public class HeadBobSystem : ComponentSystem {
 			}
 		}
 
-		if ( hbm.jocManager.joc.rawMovementVector != Vector2.zero && hbm.jocManager.joc.grounded ) {
+		if ( hbm.jom.joc.rawMovementVector != Vector2.zero && hbm.jom.joc.grounded ) {
 			//Use a sine functions to move the camera up and down.
-			hbm.jocManager.cam.transform.localPosition = new Vector3( 0.0f,
-				hbm.jocManager.joc.currentCamHeight + ( Mathf.Sin( Time.fixedTime * Mathf.PI * hbm.headBobSpeed ) * hbm.headBobIntensity ), 0.0f );
+			hbm.jom.cam.transform.localPosition = new Vector3( 0.0f,
+				hbm.jom.joc.currentCamHeight + ( Mathf.Sin( Time.fixedTime * Mathf.PI * hbm.headBobSpeed ) * hbm.headBobIntensity ), 0.0f );
 		}
 	}
 

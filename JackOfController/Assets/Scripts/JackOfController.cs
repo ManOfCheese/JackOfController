@@ -3,20 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public enum AerialMovementSettings {
-    FullMovement,
-    FullCameraMovement,
-    LimitedCameraMovement,
-    NoMovement
-}
-
-public enum SprintMode {
-    HoldToSprint,
-    ToggleSprint,
-    SinglePressSprint
-}
-
-public class JackOfController : MonoBehaviour {
+public class JackOfController : Module {
 
     public JackOfControllerSystem system;
 
@@ -35,66 +22,23 @@ public class JackOfController : MonoBehaviour {
 
     [Header( "Movement Settings" )]
     [Tooltip("Speed of movement in units per second")]
-    public float speed = 5f;
+    public float walkSpeed = 5f;
     [Tooltip( "How fast does the player fall" )]
     public float gravity = -9.81f;
     public float stickToGroundForce = 10f;
-
-    [Header( "Sprint Settings" )]
-    [Tooltip( "Is sprinting enabled" )]
-    public bool sprintAllowed = true;
-    public SprintMode sprintMode;
-    [Tooltip( "Sprinting speed in units per second" )]
-    public float sprintSpeed = 0f;
-    [Tooltip( "Sprinting speed relative to the walking speed" )]
-    public float relativeSprintSpeed = 2f;
-    public AnimationCurve startSprintCurve;
-    public AnimationCurve endSprintCurve;
-
-    [Header( "Jump Settings" )]
-    [Tooltip( "Height of the jump" )]
-    public float jumpHeight = 5f;
-    [Tooltip( "How many times the player can jump" )]
-    public int jumps = 1;
-    [Tooltip( "How much freedom of movement should the player have in mid-air?" )]
-    public AerialMovementSettings aerialMovement;
-    [Tooltip( "How fast can the player change direction in mid-air with limited camera movement" )]
-    public float aerialTurnSpeed;
-    public bool midAirSprint;
 
     [Header( "Groundcheck Settings" )]
     public float groundDistance;
     public LayerMask groundMask;
 
-    [HideInInspector] public float rSprintSpeed; 
-    [HideInInspector] public Camera cam;
-    [HideInInspector] public CharacterController cc;
-    [HideInInspector] public PlayerInput playerInput;
-    [HideInInspector] public GroundedState groundedState;
-    [HideInInspector] public AirborneState airborneState;
-
-    //Startup
-    [ReadOnly] public float playerStartHeight;
-    [ReadOnly] public float camStartHeight;
-
     //Runtime
     [ReadOnly] public bool moving = false;
-    [ReadOnly] public bool sprinting = false;
-    [ReadOnly] public bool jump = false;
     [ReadOnly] public bool grounded = true;
-    [ReadOnly] public float currentSpeed;
-    [ReadOnly] public float currentCamHeight;
     [ReadOnly] public float xCamRotation = 0.0f;
     [ReadOnly] public float yCamRotation = 0.0f;
     [ReadOnly] public Vector2 lookVector;
     [ReadOnly] public Vector2 rawMovementVector;
     [ReadOnly] public Vector3 velocity;
-    [ReadOnly] public Vector3 velocityOnJump;
-
-    private bool sprintStart = false;
-    private bool sprintEnd = false;
-    private bool sprintToggle = false;
-    private int jumpCount;
 
     private void Awake() {
         system.joc = this;
@@ -113,148 +57,7 @@ public class JackOfController : MonoBehaviour {
         if ( value.canceled )
             moving = false;
     }
-
-    public void OnSprint( InputAction.CallbackContext value ) {
-        if ( value.started ) {
-            sprintStart = true;
-            sprintToggle = true;
-        }
-        if ( value.canceled ) {
-            sprintEnd = true;
-        }
-    }
-
-    public void OnJump( InputAction.CallbackContext value ) {
-        if ( value.performed && ( grounded || jumpCount < jumps ) ) jump = true;
-    }
 	#endregion
-
-	#region Movement
-    public void CameraLook() {
-        xCamRotation -= sensitivity * lookVector.x;
-        yCamRotation += sensitivity * lookVector.y;
-
-        xCamRotation %= 360;
-        yCamRotation %= 360;
-        xCamRotation = Mathf.Clamp( xCamRotation, xRotationLimitsUp, xRotationLimitsDown );
-        cam.transform.eulerAngles = new Vector3( xCamRotation, yCamRotation, cam.transform.eulerAngles.z );
-        cc.transform.eulerAngles = new Vector3( jom.cc.transform.eulerAngles.x, yCamRotation, 
-            cc.transform.eulerAngles.z );
-    }
-
-    public void Walk() {
-        if ( grounded || aerialMovement == AerialMovementSettings.FullMovement ) {
-            Vector3 relativeMovementVector = rawMovementVector.x * cc.transform.right + rawMovementVector.y * cc.transform.forward;
-            Vector3 finalMovementVector = new Vector3( relativeMovementVector.x * currentSpeed, velocity.y, 
-                relativeMovementVector.z * currentSpeed );
-            cc.Move( finalMovementVector * Time.deltaTime );
-        }
-    }
-
-    public void Jump() {
-        if ( jump && ( grounded || jumpCount < jumps ) ) {
-            velocity.y = Mathf.Sqrt( jumpHeight * -2 * gravity );
-            jump = false;
-            if ( aerialMovement != AerialMovementSettings.FullMovement ) velocityOnJump = cc.velocity;
-            jumpCount++;
-        }
-        cc.Move( ( velocityOnJump + velocity ) * Time.deltaTime );
-    }
-
-    public void LookMove() {
-        if ( aerialMovement == AerialMovementSettings.FullCameraMovement || aerialMovement == AerialMovementSettings.LimitedCameraMovement ) {
-            Vector3 camVector = new Vector3( cam.transform.forward.x, 0f, cam.transform.forward.z );
-
-            if ( aerialMovement == AerialMovementSettings.FullCameraMovement ) {
-                velocityOnJump = camVector * currentSpeed;
-            }
-            if ( aerialMovement == AerialMovementSettings.LimitedCameraMovement ) {
-                velocityOnJump = ( ( ( camVector * aerialTurnSpeed ) + velocityOnJump ) / 2f ).normalized * currentSpeed;
-            }
-        }
-	}
-
-    public void Gravity() {
-        velocity.y += gravity * Time.deltaTime;
-    }
-
-    public void StickToGround() {
-        velocity.y = stickToGroundForce;
-        cc.Move( velocity );
-    }
-	#endregion
-
-	#region Checks
-	public void CheckGround() {
-        bool newGrounded;
-
-        float radius = cc.height / 4f;
-        newGrounded = Physics.CheckSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, cc.transform.position.z ), 
-            groundDistance, groundMask );
-
-        if ( newGrounded != grounded ) {
-            if ( newGrounded && jom.stateMachine.CurrentState != jom.statesByName[ "GroundedState" ] ) {
-                jom.stateMachine.ChangeState( jom.statesByName[ "GroundedState" ] );
-                velocityOnJump = Vector3.zero;
-                jumpCount = 0;
-            }
-            if ( !newGrounded && jom.stateMachine.CurrentState != jom.statesByName[ "AirborneState" ] ) 
-                jom.stateMachine.ChangeState( jom.statesByName[ "AirborneState" ] );
-        }
-
-        grounded = newGrounded;
-    }
-
-    public void CheckSprint() {
-        if ( sprintAllowed && ( grounded || midAirSprint ) ) {
-            if ( sprintMode == SprintMode.HoldToSprint ) {
-                if ( sprintStart ) {
-                    sprintStart = false;
-                    StartSprint();
-                }
-                else if ( sprintEnd ) {
-                    sprintEnd = false;
-                    EndSprint();
-                }
-			}
-            else if ( sprintMode == SprintMode.SinglePressSprint ) {
-                if ( sprintStart ) {
-                    sprintStart = false;
-                    StartSprint();
-                }
-                else if ( !moving ) {
-                    EndSprint();
-				}
-            }
-            else if ( sprintMode == SprintMode.ToggleSprint ) {
-                if ( sprintToggle ) {
-                    bool newSprinting = !sprinting;
-                    sprintToggle = false;
-
-                    if ( newSprinting ) {
-                        StartSprint();
-                    }
-					else {
-                        EndSprint();
-                    }
-                }
-            }
-        }
-    }
-	#endregion
-
-    public void StartSprint() {
-        sprinting = true;
-        if ( sprintSpeed != 0f )
-            currentSpeed = sprintSpeed;
-        else
-            currentSpeed = speed * relativeSprintSpeed;
-    }
-
-    public void EndSprint() {
-        sprinting = false;
-        currentSpeed = speed;
-    }
 
 	public void OnDrawGizmos() {
         float radius = playerStartHeight / 4;

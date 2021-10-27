@@ -21,7 +21,7 @@ public class JackOfControllerSystem : ComponentSystem {
         joc.airborneState = AirborneState.Instance;
         joc.airborneState.stateName = "AirborneState";
 
-        joc.currentSpeed = joc.speed;
+        joc.currentSpeed = joc.walkSpeed;
         joc.playerStartHeight = joc.jom.cc.height;
         joc.camStartHeight = joc.jom.cam.transform.localPosition.y;
         joc.currentCamHeight = joc.camStartHeight;
@@ -30,7 +30,7 @@ public class JackOfControllerSystem : ComponentSystem {
         if ( joc.sprintSpeed != 0f )
             joc.rSprintSpeed = joc.sprintSpeed;
         else
-            joc.rSprintSpeed = joc.speed * joc.relativeSprintSpeed;
+            joc.rSprintSpeed = joc.walkSpeed * joc.relativeSprintSpeed;
 
 
     }

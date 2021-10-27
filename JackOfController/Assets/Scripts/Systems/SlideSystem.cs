@@ -11,12 +11,12 @@ public class SlideSystem : ComponentSystem {
 		if ( sm.slideSpeed != 0f )
 			sm.rSlideSpeed = sm.slideSpeed;
 		else
-			sm.rSlideSpeed = sm.jocManager.joc.rSprintSpeed * sm.relativeSlideSpeed;
+			sm.rSlideSpeed = sm.jom.joc.rSprintSpeed * sm.relativeSlideSpeed;
 	}
 
 	public override void OnUpdate() {
-		if ( sm.jocManager.joc.currentSpeed < sm.jocManager.joc.speed ) {
-			sm.jocManager.stateMachine.ChangeState( sm.jocManager.statesByName[ "GroundedState" ] );
+		if ( sm.jom.currentSpeed < sm.jom.joc.walkSpeed ) {
+			sm.jom.stateMachine.ChangeState( sm.jom.statesByName[ "GroundedState" ] );
 		}
 		sm.CheckSlope();
 		Debug.DrawLine( sm.transform.position, sm.transform.position + sm.transform.forward * 20f, Color.blue );

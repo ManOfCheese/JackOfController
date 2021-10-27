@@ -23,48 +23,46 @@ public class CrouchModule : Module {
 
 	protected override void Awake() {
 		base.Awake();
-        state = CrouchedState.Instance;
-        state.stateName = "CrouchedState";
 	}
 
 	public void OnCrouch( InputAction.CallbackContext value ) {
-        State<JackOfManager> currentState = jocManager.stateMachine.CurrentState;
+        State<JackOfManager> currentState = jom.stateMachine.CurrentState;
 
-        if ( currentState != jocManager.statesByName[ "AirborneState" ] ) {
+        if ( currentState != jom.statesByName[ "AirborneState" ] ) {
             if ( toggleCrouch ) {
                 bool newCrouching = !crouching;
 
-                if ( newCrouching && currentState != jocManager.statesByName[ "CrouchedState" ] ) {
-                    if ( sprintCrouch || !jocManager.joc.sprinting )
-                        jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
+                if ( newCrouching && currentState != jom.statesByName[ "CrouchedState" ] ) {
+                    if ( sprintCrouch || !jom.joc.sprinting )
+                        jom.stateMachine.ChangeState( jom.statesByName[ "CrouchedState" ] );
                 }
                 else {
                     if ( CheckCeiling() )
                         crouchCanceled = true;
-                    else if ( newCrouching && currentState != jocManager.statesByName[ "GroundedState" ] )
-                        jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
+                    else if ( newCrouching && currentState != jom.statesByName[ "GroundedState" ] )
+                        jom.stateMachine.ChangeState( jom.statesByName[ "GroundedState" ] );
                 }
             }
             else {
-                if ( value.performed && currentState != jocManager.statesByName[ "CrouchedState" ] ) {
-                    if ( sprintCrouch || !jocManager.joc.sprinting )
-                        jocManager.stateMachine.ChangeState( jocManager.statesByName[ "CrouchedState" ] );
+                if ( value.performed && currentState != jom.statesByName[ "CrouchedState" ] ) {
+                    if ( sprintCrouch || !jom.joc.sprinting )
+                        jom.stateMachine.ChangeState( jom.statesByName[ "CrouchedState" ] );
                 }
                 if ( value.canceled ) {
                     if ( CheckCeiling() )
                         crouchCanceled = true;
-                    else if ( currentState != jocManager.statesByName[ "GroundedState" ] )
-                        jocManager.stateMachine.ChangeState( jocManager.statesByName[ "GroundedState" ] );
+                    else if ( currentState != jom.statesByName[ "GroundedState" ] )
+                        jom.stateMachine.ChangeState( jom.statesByName[ "GroundedState" ] );
                 }
             }
         }
     }
 
     public bool CheckCeiling() {
-        float radius = jocManager.joc.playerStartHeight / 4f;
-        return Physics.CheckSphere( new Vector3( jocManager.cc.transform.position.x, 
-            jocManager.cc.transform.position. y + ( radius * 2f ),
-            jocManager.joc.transform.position.z ), radius, jocManager.joc.groundMask );
+        float radius = jom.playerStartHeight / 4f;
+        return Physics.CheckSphere( new Vector3( jom.cc.transform.position.x, 
+            jom.cc.transform.position. y + ( radius * 2f ),
+            jom.joc.transform.position.z ), radius, jom.joc.groundMask );
     }
 
 }

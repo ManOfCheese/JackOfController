@@ -15,7 +15,7 @@ public class ScreenTiltSystem : ComponentSystem {
 			tilt += zRotation * Time.deltaTime;
 			tilt = Mathf.Clamp( tilt, -stm.maximumTilt, stm.maximumTilt );
 
-			Camera cam = stm.jocManager.cam;
+			Camera cam = stm.jom.cam;
 			cam.transform.eulerAngles = new Vector3( cam.transform.rotation.x, cam.transform.rotation.y, -tilt );
 		}
 		else {
@@ -34,7 +34,7 @@ public class ScreenTiltSystem : ComponentSystem {
 						tilt += adjustedTilt;
 				}
 			}
-			Camera cam = stm.jocManager.cam;
+			Camera cam = stm.jom.cam;
 			cam.transform.eulerAngles = new Vector3( cam.transform.rotation.x, cam.transform.rotation.y, -tilt );
 		}
 
