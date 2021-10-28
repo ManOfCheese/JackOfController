@@ -12,7 +12,7 @@ public class CheckSlope : Function {
 
 	public override void ExecuteFunction() {
 		sm.slopeCheckOrigin = new Vector3( sm.transform.position.x, sm.transform.position.y - ( sm.jom.cc.height / 2 ) + sm.startDistanceFromBottom,
-			transform.position.z );
+			sm.transform.position.z );
 		RaycastHit hit;
 		if ( Physics.SphereCast( sm.slopeCheckOrigin, sm.sphereCastRadius, Vector3.down, out hit, sm.sphereCastDistance, sm.castingMask ) ) {
 			sm.groundSlopeAngle = Vector3.Angle( hit.normal, Vector3.up );

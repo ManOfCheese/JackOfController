@@ -6,8 +6,8 @@ public class CheckSprint : Function {
 
     private SprintModule spm;
 
-    public void Init( SprintModule _SpM ) {
-        this.spm = _SpM;
+    public void Init( SprintModule _spm ) {
+        this.spm = _spm;
     }
 
     public override void ExecuteFunction() {
@@ -16,7 +16,7 @@ public class CheckSprint : Function {
                 spm.sprintStart = false;
                 StartSprint();
             }
-            else if ( sprintEnd ) {
+            else if ( spm.sprintEnd ) {
                 spm.sprintEnd = false;
                 EndSprint();
             }
@@ -24,9 +24,9 @@ public class CheckSprint : Function {
         else if ( spm.sprintMode == SprintMode.SinglePressSprint ) {
             if ( spm.sprintStart ) {
                 spm.sprintStart = false;
-                spm.StartSprint();
+                StartSprint();
             }
-            else if ( !moving ) {
+            else if ( !spm.joc.moving ) {
                 EndSprint();
             }
         }
@@ -55,6 +55,6 @@ public class CheckSprint : Function {
 
     private void EndSprint() {
         spm.sprinting = false;
-        spm.jom.currentSpeed = walkSpeed;
+        spm.jom.currentSpeed = spm.joc.walkSpeed;
     }
 }

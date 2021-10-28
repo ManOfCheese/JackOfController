@@ -13,7 +13,10 @@ public class HeadBobModule : Module {
     [Tooltip( "How far up and down the camera moves, if  this is higher it the camera will also need to move faster to cover the distance." )]
     public float headBobIntensity;
 
-	[HideInInspector] public float currentHeadBobSpeed;
+	[ReadOnly] public float currentHeadBobSpeed;
+
+	//Optional
+	[HideInInspector] public SprintModule spm;
 
 	protected override void Awake() {
 		system.hbm = this;

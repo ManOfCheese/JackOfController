@@ -44,11 +44,6 @@ public class SlideModule : Module {
 	public Vector3 rayOriginOffset2 = new Vector3( 0.2f, 0f, -0.16f );
 	public Vector3 slopeCheckOrigin = Vector3.zero;
 
-	[HideInInspector] public JackOfController joc;
-	[HideInInspector] public float rSlideSpeed;
-	[HideInInspector] public float currentSlideSpeed;
-	[HideInInspector] public Vector3 slideStartVelocity;
-
 	//The adjusted velocity is a copy of slideStartVelocity that loses speed over time. 
 	//We do this because we need start velocity to comapre to the slide direciton.
 	[ReadOnly] public Vector3 adjustedStartVelocity;
@@ -57,13 +52,24 @@ public class SlideModule : Module {
 	[ReadOnly] public float groundSlopeAngle;
 	[ReadOnly] public bool sliding;
 
+	[HideInInspector] public float rSlideSpeed;
+	[HideInInspector] public float currentSlideSpeed;
+	[HideInInspector] public Vector3 slideStartVelocity;
+
+	//Dependencies
+	[HideInInspector] public JackOfController joc;
+	[HideInInspector] public CharacterController cc;
+
+	//Optional
+	[HideInInspector] public SprintModule spm;
+
 	protected override void Awake() {
 		system.sm = this;
 	}
 
 	public void OnSlide( InputAction.CallbackContext value ) {
 		if ( slideMode == SlideMode.SinglePressSlide ) {
-			if ( jom.joc.sprinting && jom.stateMachine.CurrentState != jom.statesByName[ "SlideState" ] )
+			if ( spm.sprinting && jom.stateMachine.CurrentState != jom.statesByName[ "SlideState" ] )
 				jom.stateMachine.ChangeState( jom.statesByName[ "SlideState" ] );
 		}
 		else if ( slideMode == SlideMode.HoldToSlide ) {

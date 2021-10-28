@@ -25,14 +25,15 @@ public class SprintModule : Module {
     [Tooltip( "Determines the loss of speed when you stop sprinting." )]
     public AnimationCurve endSprintCurve;
 
-    [HideInInspector] JackOfController joc;
-
     [ReadOnly] public bool sprinting = false;
 
-    private float rSprintSpeed;
-    private bool sprintStart = false;
-    private bool sprintEnd = false;
-    private bool sprintToggle = false;
+    [HideInInspector] public float rSprintSpeed;
+    [HideInInspector] public bool sprintStart = false;
+    [HideInInspector] public bool sprintEnd = false;
+    [HideInInspector] public bool sprintToggle = false;
+
+    //Dependencies
+    [HideInInspector] public JackOfController joc;
 
     public void OnSprint( InputAction.CallbackContext value ) {
         if ( value.started ) {

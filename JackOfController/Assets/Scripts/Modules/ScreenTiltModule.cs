@@ -12,9 +12,9 @@ public class ScreenTiltModule : Module {
 	[Tooltip( "How fast does the tilting happen." )]
 	public float tiltSpeed;
 
-	[HideInInspector] public Vector2 rawMovementVector;
-
 	[ReadOnly] public float tilt;
+
+	[HideInInspector] public Vector2 rawMovementVector;
 
 	protected override void Awake() {
 		system.stm = this;

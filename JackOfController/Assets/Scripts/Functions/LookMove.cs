@@ -19,7 +19,7 @@ public class LookMove : Function {
                 jm.velocityOnJump = camVector * jm.jom.currentSpeed;
             }
             if ( jm.aerialMovement == AerialMovementSettings.LimitedCameraMovement ) {
-                jm.velocityOnJump = ( ( ( camVector * jm.aerialTurnSpeed ) + velocityOnJump ) / 2f ).normalized * jom.currentSpeed;
+                jm.velocityOnJump = ( ( ( camVector * jm.aerialTurnSpeed ) + jm.velocityOnJump ) / 2f ).normalized * jm.jom.currentSpeed;
             }
         }
     }

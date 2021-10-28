@@ -5,10 +5,6 @@ using UnityEngine.InputSystem;
 
 public class JackOfController : Module {
 
-    public JackOfControllerSystem system;
-
-    [HideInInspector] public JackOfManager jom;
-
     [Header( "Camera Settings" )]
     [Tooltip( "When true camera controls will be inverted meaning moving left will move the camera to the right." )]
     public bool inverted;
@@ -31,6 +27,12 @@ public class JackOfController : Module {
     public float groundDistance;
     public LayerMask groundMask;
 
+    //Dependencies
+    [HideInInspector] public CharacterController cc;
+
+    //Optional
+    [HideInInspector] public SprintModule spm;
+
     //Runtime
     [ReadOnly] public bool moving = false;
     [ReadOnly] public bool grounded = true;
@@ -39,10 +41,6 @@ public class JackOfController : Module {
     [ReadOnly] public Vector2 lookVector;
     [ReadOnly] public Vector2 rawMovementVector;
     [ReadOnly] public Vector3 velocity;
-
-    private void Awake() {
-        system.joc = this;
-    }
 
     #region Input
 	public void OnLook( InputAction.CallbackContext value ) {
@@ -59,15 +57,15 @@ public class JackOfController : Module {
     }
 	#endregion
 
-	public void OnDrawGizmos() {
-        float radius = playerStartHeight / 4;
+	//public void OnDrawGizmos() {
+ //       float radius = jom.playerStartHeight / 4;
 
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, 
-            cc.transform.position.z ), groundDistance );
+ //       Gizmos.color = Color.yellow;
+ //       Gizmos.DrawWireSphere( new Vector3( cc.transform.position.x, cc.transform.position.y - radius, 
+ //           cc.transform.position.z ), groundDistance );
 
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere( new Vector3( cc.transform.position.x, cc.transform.position.y + radius, 
-            cc.transform.position.z ), groundDistance );
-    }
+ //       Gizmos.color = Color.red;
+ //       Gizmos.DrawWireSphere( new Vector3( cc.transform.position.x, cc.transform.position.y + radius, 
+ //           cc.transform.position.z ), groundDistance );
+ //   }
 }

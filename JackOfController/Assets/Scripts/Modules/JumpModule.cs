@@ -22,12 +22,12 @@ public class JumpModule : Module {
     [Tooltip( "How fast can the player change direction in mid-air with limited camera movement" )]
     public float aerialTurnSpeed;
 
-    [HideInInspector] public JackOfManager jom;
-    [HideInInspector] public JackOfController joc;
-
     [ReadOnly] public bool jump = false;
     [ReadOnly] public int jumpCount;
     [ReadOnly] public Vector3 velocityOnJump;
+
+    //Dependencies
+    [HideInInspector] public JackOfController joc;
 
     public void OnJump( InputAction.CallbackContext value ) {
         if ( value.performed && ( base.jom.joc.grounded || jumpCount < jumps ) ) jump = true;

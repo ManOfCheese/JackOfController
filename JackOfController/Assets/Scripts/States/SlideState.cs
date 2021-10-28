@@ -6,35 +6,29 @@ using StateMachine;
 [CreateAssetMenu( fileName = "SlideState", menuName = "States/SlideState" )]
 public class SlideState : State {
 
-	public override void EnterState() {
-		JackOfController joc = _owner.joc;
-		SlideModule sm = _owner.modulesByName[ "SlideModule" ] as SlideModule;
+	private SlideModule sm;
 
-		_owner.cam.transform.localPosition = new Vector3( _owner.cam.transform.localPosition.x, sm.slideCameHeight,
-			_owner.cam.transform.localPosition.z );
-		joc.currentCamHeight = sm.slideCameHeight;
-		_owner.cc.height = sm.slidePlayerHeight;
-		_owner.cc.Move( Vector3.down * 200f );
+	public override void EnterState() {
+		sm.jom.cam.transform.localPosition = new Vector3( sm.jom.cam.transform.localPosition.x, sm.slideCameHeight,
+			sm.jom.cam.transform.localPosition.z );
+		sm.jom.currentCamHeight = sm.slideCameHeight;
+		sm.cc.height = sm.slidePlayerHeight;
+		sm.cc.Move( Vector3.down * 200f );
 
 		if ( sm.slideSpeed != 0f ) {
-			_owner.joc.currentSpeed = sm.slideSpeed;
+			sm.jom.currentSpeed = sm.slideSpeed;
 		}
 		else {
-			if ( _owner.joc.sprintSpeed != 0f )
-				_owner.joc.currentSpeed = _owner.joc.sprintSpeed * sm.relativeSlideSpeed;
-			else
-				_owner.joc.currentSpeed = _owner.joc.walkSpeed * _owner.joc.relativeSprintSpeed * sm.relativeSlideSpeed;
+			sm.jom.currentSpeed = sm.spm.rSprintSpeed;
 		}
 
-		sm.slideStartVelocity = new Vector3( _owner.cc.transform.forward.x, 0f, _owner.cc.transform.forward.z ).normalized * sm.rSlideSpeed;
+		sm.slideStartVelocity = new Vector3( sm.cc.transform.forward.x, 0f, sm.cc.transform.forward.z ).normalized * sm.rSlideSpeed;
 		sm.adjustedStartVelocity = sm.slideStartVelocity;
 		sm.slideDir = sm.slideStartVelocity.normalized;
 		sm.currentSlideSpeed = sm.rSlideSpeed;
 	}
 
 	public override void UpdateState() {
-		SlideModule sm = _owner.modulesByName[ "SlideModule" ] as SlideModule;
-
 		for ( int i = 0; i < functionsToUpdate.Length; i++ ) {
 			functionsToUpdate[ i ].ExecuteFunction();
 		}
@@ -47,24 +41,23 @@ public class SlideState : State {
 		if ( sm.groundSlopeAngle < sm.slopeAngleRange.x ) {
 			sm.currentSlideSpeed -= sm.speedLoss * Time.deltaTime;
 		}
-		if ( _owner.joc.currentSpeed < _owner.joc.walkSpeed && sm.groundSlopeAngle < sm.minSlopeAngle ) {
-			_owner.stateMachine.ChangeState( _owner.statesByName[ "GroundedState" ] );
+		if ( sm.jom.currentSpeed < sm.joc.walkSpeed && sm.groundSlopeAngle < sm.slopeAngleRange.x ) {
+			sm.jom.stateMachine.ChangeState( sm.jom.statesByName[ "GroundedState" ] );
 		}
 	}
 
 	public override void ExitState() {
-		Debug.Log( "Exiting Slide" );
-		_owner.cam.transform.localPosition = new Vector3( _owner.cam.transform.localPosition.x,
-			_owner.joc.camStartHeight, _owner.cam.transform.localPosition.z );
-		_owner.joc.currentCamHeight = _owner.joc.camStartHeight;
-		_owner.cc.height = _owner.joc.playerStartHeight;
-		if ( _owner.joc.currentSpeed >= _owner.joc.rSprintSpeed ) {
-			_owner.joc.StartSprint();
+		sm.jom.cam.transform.localPosition = new Vector3( sm.jom.cam.transform.localPosition.x,
+			sm.jom.camStartHeight, sm.jom.cam.transform.localPosition.z );
+		sm.jom.currentCamHeight = sm.jom.camStartHeight;
+		sm.cc.height = sm.jom.playerStartHeight;
+		if ( sm.jom.currentSpeed >= sm.spm.rSprintSpeed ) {
+			//sm.joc.StartSprint();
 		}
 		else {
-			_owner.joc.currentSpeed = _owner.joc.walkSpeed;
+			sm.jom.currentSpeed = sm.joc.walkSpeed;
 		}
-		_owner.joc.sprinting = false;
+		sm.spm.sprinting = false;
 	}
 
 }
