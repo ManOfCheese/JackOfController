@@ -5,8 +5,9 @@ using StateMachine;
 
 public class JackOfManager : MonoBehaviour {
 
-	public JackOfManagerSystem system;
+	public JackOfManager_System system;
 	[Space( 10 )]
+	public Function[] functions;
 	public ComponentSystem[] systemInitOrder;
 	public ComponentSystem[] systemUpdateOrder;
 
@@ -20,7 +21,7 @@ public class JackOfManager : MonoBehaviour {
 	[ReadOnly] public float currentPlayerHeight;
 	[ReadOnly] public string currentState;
 
-	[HideInInspector] public JackOfController joc;
+	[HideInInspector] public Core_Module core;
 	[HideInInspector] public Camera cam;
 	[HideInInspector] public CharacterController cc;
 	[HideInInspector] public FiniteStateMachine stateMachine;
@@ -28,11 +29,7 @@ public class JackOfManager : MonoBehaviour {
 	[HideInInspector] public Dictionary<string, State> statesByName;
 
 	private void Awake() {
-		system.jom = this;
-		joc.jom = this;
-		cam = transform.parent.GetComponentInChildren<Camera>();
-		cc = transform.parent.GetComponent<CharacterController>();
-		stateMachine = new FiniteStateMachine();
+		system.manager = this;
 	}
 
 	private void Start() {
