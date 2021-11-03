@@ -7,7 +7,7 @@ public class LookMove_Func : Function {
 
     private Jump_Module jm;
 
-    public void Init() {
+    public override void Init() {
         jm = manager.modulesByName[ "JumpModule" ] as Jump_Module;
         if ( jm == null ) Debug.LogError( "You cannot use the LookMove function without the Jump Module." );
     }
