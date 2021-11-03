@@ -74,10 +74,12 @@ public class Crouch_Module : Module {
         if ( manager.core.CheckCeiling() ) {
             crouchCanceled = true;
         }
-        if ( manager.core.grounded )
-            manager.stateMachine.ChangeState( groundedState );
-        else
-            manager.stateMachine.ChangeState( manager.statesByName[ "AirborneState" ] );
+		else {
+            if ( manager.core.grounded )
+                manager.stateMachine.ChangeState( groundedState );
+            else
+                manager.stateMachine.ChangeState( manager.statesByName[ "AirborneState" ] );
+        }
     }
 
 }
