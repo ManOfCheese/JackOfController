@@ -12,7 +12,9 @@ public class CheckGround_Func : Function {
 
     public override void Init() {
         core = manager.core;
-        jm = manager.modulesByName[ "JumpModule" ] as Jump_Module;
+        if ( manager.modulesByName[ "JumpModule" ] ) {
+            jm = manager.modulesByName[ "JumpModule" ] as Jump_Module;
+        }
         airborneState = manager.statesByName[ "AirborneState" ] as Airborne_State;
         groundedState = manager.statesByName[ "GroundedState" ] as Grounded_State;
     }
@@ -28,6 +30,7 @@ public class CheckGround_Func : Function {
             if ( newGrounded && core.manager.stateMachine.CurrentState != groundedState ) {
                 core.manager.stateMachine.ChangeState( groundedState );
                 jm.velocityOnJump = Vector3.zero;
+                jm.jumpCount = 0;
             }
             if ( !newGrounded && core.manager.stateMachine.CurrentState != airborneState ) {
                 core.manager.stateMachine.ChangeState( airborneState );

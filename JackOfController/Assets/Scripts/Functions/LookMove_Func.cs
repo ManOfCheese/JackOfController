@@ -13,17 +13,9 @@ public class LookMove_Func : Function {
     }
 
     public override void ExecuteFunction() {
-        if ( jm.aerialMovement == AerialMovementSettings.FullCameraMovement || 
-            jm.aerialMovement == AerialMovementSettings.LimitedCameraMovement ) {
-            Vector3 camVector = new Vector3( jm.manager.cam.transform.forward.x, 0f, jm.manager.cam.transform.forward.z );
+        Vector3 camVector = new Vector3( jm.manager.cam.transform.forward.x, 0f, jm.manager.cam.transform.forward.z );
 
-            if ( jm.aerialMovement == AerialMovementSettings.FullCameraMovement ) {
-                jm.velocityOnJump = camVector * jm.manager.currentSpeed;
-            }
-            if ( jm.aerialMovement == AerialMovementSettings.LimitedCameraMovement ) {
-                jm.velocityOnJump = ( ( ( camVector * jm.aerialTurnSpeed ) + jm.velocityOnJump ) / 2f ).normalized * jm.manager.currentSpeed;
-            }
-        }
+        jm.velocityOnJump = ( ( ( camVector * jm.aerialTurnSpeed ) + jm.velocityOnJump ) ).normalized * jm.manager.currentSpeed;
     }
 
 }
