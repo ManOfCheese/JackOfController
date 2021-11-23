@@ -30,7 +30,8 @@ public class HeadBob_System : ComponentSystem {
 		if ( hbm.manager.core.rawMovementVector != Vector2.zero && hbm.manager.core.grounded ) {
 			//Use a sine functions to move the camera up and down.
 			hbm.manager.cam.transform.localPosition = new Vector3( 0.0f,
-				hbm.manager.currentCamHeight + ( Mathf.Sin( Time.fixedTime * Mathf.PI * hbm.currentHeadBobSpeed ) * hbm.headBobIntensity ), 0.0f );
+				hbm.manager.currentCamHeight + ( Mathf.Sin( Time.fixedTime * Mathf.PI * hbm.currentHeadBobSpeed ) * 
+				hbm.headBobIntensity ), 0.0f );
 		}
 	}
 
