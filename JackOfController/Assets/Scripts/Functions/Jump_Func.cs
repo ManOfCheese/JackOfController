@@ -18,7 +18,7 @@ public class Jump_Func : Function {
         if ( jm.jump && ( core.grounded || jm.jumpCount < jm.jumps ) ) {
             core.velocity.y = Mathf.Sqrt( jm.jumpHeight * -2 * core.gravity );
             jm.jump = false;
-            if ( jm.aerialMovement != AerialMovementSettings.FullMovement ) jm.velocityOnJump = jm.manager.cc.velocity;
+            jm.velocityOnJump = jm.manager.cc.velocity;
             jm.jumpCount++;
         }
         jm.manager.cc.Move( ( jm.velocityOnJump + core.velocity ) * Time.deltaTime );

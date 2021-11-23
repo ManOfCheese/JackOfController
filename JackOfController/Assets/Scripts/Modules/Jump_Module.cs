@@ -17,8 +17,6 @@ public class Jump_Module : Module {
     public float jumpHeight = 5f;
     [Tooltip( "How many times the player can jump" )]
     public int jumps = 1;
-    [Tooltip( "How much freedom of movement should the player have in mid-air?" )]
-    public AerialMovementSettings aerialMovement;
     [Tooltip( "How fast can the player change direction in mid-air with limited camera movement" )]
     public float aerialTurnSpeed;
 
@@ -32,7 +30,7 @@ public class Jump_Module : Module {
     }
 
 	public void OnJump( InputAction.CallbackContext value ) {
-        if ( value.performed && ( base.manager.core.grounded || jumpCount < jumps ) ) jump = true;
+        if ( value.performed && ( manager.core.grounded || jumpCount < jumps ) ) jump = true;
     }
 
 }

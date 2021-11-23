@@ -12,7 +12,6 @@ public class Grounded_State : State {
 
 	public override void EnterState() {
 		manager.currentSpeed = manager.core.walkSpeed;
-		Debug.Log( manager.currentSpeed );
 	}
 
 	public override void UpdateState() {
